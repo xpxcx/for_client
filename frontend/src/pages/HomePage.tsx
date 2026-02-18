@@ -18,9 +18,8 @@ export default function HomePage() {
     <section className="page home-page">
       <div className="hero">
         <h1>Добро пожаловать на сайт-портфолио</h1>
-        <p>Профессиональная деятельность педагога</p>
       </div>
-      <div className="card">
+      {/* <div className="card">
         {error ? (
           <p className="error">{error}</p>
         ) : (
@@ -30,7 +29,7 @@ export default function HomePage() {
         <p>
           <Link to="/about">О себе</Link> · <Link to="/materials">Материалы</Link> · <Link to="/news">Новости</Link>
         </p>
-      </div>
+      </div> */}
     </section>
   )
 }

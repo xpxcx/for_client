@@ -28,56 +28,7 @@ export default function ContactPage() {
       <div className="card">
         <p>Email: teacher@example.com · Телефон: +7 (XXX) XXX-XX-XX</p>
       </div>
-      <form className="contact-form card" onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label htmlFor="contact-name">Имя *</label>
-          <input
-            id="contact-name"
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="contact-email">Email *</label>
-          <input
-            id="contact-email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="contact-category">Категория</label>
-          <select
-            id="contact-category"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-          >
-            <option value="student">Обучающийся</option>
-            <option value="parent">Родитель</option>
-            <option value="colleague">Коллега</option>
-            <option value="other">Другое</option>
-          </select>
-        </div>
-        <div className="form-group">
-          <label htmlFor="contact-message">Сообщение *</label>
-          <textarea
-            id="contact-message"
-            rows={5}
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            required
-          />
-        </div>
-        <button type="submit" className="btn" disabled={status === 'sending'}>
-          {status === 'sending' ? 'Отправка...' : 'Отправить'}
-        </button>
-        {status === 'ok' && <p className="success">Сообщение отправлено.</p>}
-        {status === 'error' && <p className="error">Ошибка отправки.</p>}
-      </form>
+        <span>Здесь будут контакты</span>
     </section>
   )
 }
