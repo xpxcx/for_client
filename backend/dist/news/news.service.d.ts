@@ -11,5 +11,6 @@ export declare class NewsService {
     constructor(repo: Repository<News>);
     findAll(): Promise<NewsItem[]>;
     findOne(id: string): Promise<NewsItem | null>;
+    remove(id: string): Promise<boolean>;
     createFromAchievement(achievementId: number, title: string, description: string, date: string): Promise<NewsItem>;
 }

@@ -3,6 +3,7 @@ import { useRef, useState } from 'react'
 import type { Achievement } from '../../api/achievements'
 import {
   achievementsKeys,
+  createAchievement,
   deleteAchievement,
   fetchAchievements,
   updateAchievement,
@@ -23,8 +24,11 @@ const emptyForm = { title: '', description: '', date: new Date().toISOString().s
 export default function CabinetManagePage() {
   const [form, setForm] = useState(emptyForm)
   const [editingId, setEditingId] = useState<string | null>(null)
+  const [showAdd, setShowAdd] = useState(false)
   const [replaceFile, setReplaceFile] = useState<File | null>(null)
+  const [addFile, setAddFile] = useState<File | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const addFileInputRef = useRef<HTMLInputElement>(null)
   const queryClient = useQueryClient()
 
   const { data: items = [], isLoading, error } = useQuery({
@@ -55,7 +59,21 @@ export default function CabinetManagePage() {
     },
   })
 
+  const createMutation = useMutation({
+    mutationFn: createAchievement,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: achievementsKeys.list() })
+      setForm(emptyForm)
+      setAddFile(null)
+      setShowAdd(false)
+      if (addFileInputRef.current) addFileInputRef.current.value = ''
+    },
+  })
+
   const startEdit = (a: Achievement) => {
+    setShowAdd(false)
+    setAddFile(null)
+    if (addFileInputRef.current) addFileInputRef.current.value = ''
     setEditingId(a.id)
     setReplaceFile(null)
     if (fileInputRef.current) fileInputRef.current.value = ''
@@ -92,13 +110,40 @@ export default function CabinetManagePage() {
     if (fileInputRef.current) fileInputRef.current.value = ''
   }
 
+  const handleAdd = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!form.title.trim()) return
+    let imageUrl: string | undefined
+    if (addFile) {
+      try {
+        const result = await uploadMutation.mutateAsync(addFile)
+        imageUrl = result.imageUrl
+      } catch {
+        return
+      }
+    }
+    createMutation.mutate({ ...form, imageUrl })
+  }
+
+  const cancelAdd = () => {
+    setShowAdd(false)
+    setForm(emptyForm)
+    setAddFile(null)
+    if (addFileInputRef.current) addFileInputRef.current.value = ''
+  }
+
+  const submitting =
+    uploadMutation.isPending ||
+    updateMutation.isPending ||
+    deleteMutation.isPending ||
+    createMutation.isPending
+  const mutationError =
+    uploadMutation.error || updateMutation.error || deleteMutation.error || createMutation.error
+
   const handleDelete = (id: string) => {
     if (!confirm('Удалить это достижение?')) return
     deleteMutation.mutate(id)
   }
-
-  const submitting = uploadMutation.isPending || updateMutation.isPending || deleteMutation.isPending
-  const mutationError = uploadMutation.error || updateMutation.error || deleteMutation.error
 
   if (isLoading) return <div className="card"><p>Загрузка...</p></div>
   if (error || mutationError)
@@ -112,6 +157,79 @@ export default function CabinetManagePage() {
 
   return (
     <>
+      <h2>Управление достижениями</h2>
+      {showAdd && (
+        <div className="card cabinet-form-card">
+          <h3>Добавление достижения</h3>
+          <form className="contact-form" onSubmit={handleAdd}>
+            <div className="form-group">
+              <label htmlFor="manage-add-title">Название</label>
+              <input
+                id="manage-add-title"
+                value={form.title}
+                onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="manage-add-desc">Описание</label>
+              <textarea
+                id="manage-add-desc"
+                value={form.description}
+                onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
+                rows={3}
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="manage-add-date">Дата</label>
+              <input
+                id="manage-add-date"
+                type="date"
+                value={form.date}
+                onChange={(e) => setForm((f) => ({ ...f, date: e.target.value }))}
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="manage-add-image">Фотография</label>
+              <input
+                id="manage-add-image"
+                ref={addFileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={(e) => setAddFile(e.target.files?.[0] ?? null)}
+              />
+              {addFile && <p className="form-file-hint">{addFile.name}</p>}
+            </div>
+            <div className="form-actions">
+              <button type="submit" className="btn btn-primary" disabled={submitting}>
+                Добавить
+              </button>
+              <button type="button" className="btn btn-secondary" onClick={cancelAdd}>
+                Отмена
+              </button>
+            </div>
+            {(uploadMutation.error || createMutation.error) && (
+              <p className="error">
+                {uploadMutation.error instanceof Error
+                  ? uploadMutation.error.message
+                  : createMutation.error instanceof Error
+                    ? createMutation.error.message
+                    : 'Произошла ошибка'}
+              </p>
+            )}
+            {createMutation.isSuccess && !createMutation.isPending && (
+              <p className="success">Достижение добавлено.</p>
+            )}
+          </form>
+        </div>
+      )}
+      {!showAdd && !editingId && (
+        <p>
+          <button type="button" className="btn btn-primary" onClick={() => setShowAdd(true)}>
+            Добавить достижение
+          </button>
+        </p>
+      )}
       {editingId && (
         <div className="card cabinet-form-card">
           <h2>Редактирование достижения</h2>
@@ -158,7 +276,7 @@ export default function CabinetManagePage() {
               {replaceFile && <p className="form-file-hint">Новый файл: {replaceFile.name}</p>}
             </div>
             <div className="form-actions">
-              <button type="submit" className="btn" disabled={submitting}>
+              <button type="submit" className="btn btn-primary" disabled={submitting}>
                 Сохранить
               </button>
               <button type="button" className="btn btn-secondary" onClick={cancelEdit}>
@@ -169,10 +287,10 @@ export default function CabinetManagePage() {
         </div>
       )}
 
-      <h2>Список достижений</h2>
+      <h3>Список достижений</h3>
       <div className="achievements-list">
         {items.length === 0 ? (
-          <div className="card"><p>Достижений пока нет. Добавьте первое в разделе «Добавление достижений».</p></div>
+          <div className="card"><p>Достижений пока нет. Нажмите «Добавить достижение» выше.</p></div>
         ) : (
           items.map((item) => (
             <article key={item.id} className="card achievement-item achievement-card">

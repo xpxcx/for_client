@@ -4,8 +4,11 @@ import './CabinetLayout.css'
 
 const CABINET_ITEMS = [
   { path: '/cabinet/profile', label: 'Информация о профиле', adminOnly: false },
-  { path: '/cabinet/add', label: 'Добавление достижений', adminOnly: true },
   { path: '/cabinet/manage', label: 'Управление достижениями', adminOnly: true },
+  { path: '/cabinet/materials', label: 'Управление материалами', adminOnly: true },
+  { path: '/cabinet/news', label: 'Управление новостями', adminOnly: true },
+  { path: '/cabinet/links', label: 'Управление полезными ссылками', adminOnly: true },
+  { path: '/cabinet/contact-info', label: 'Настройки контактов', adminOnly: true },
 ]
 
 export default function CabinetLayout() {
@@ -15,10 +18,9 @@ export default function CabinetLayout() {
   return (
     <section className="page cabinet-page">
       <h1>Личный кабинет</h1>
-      {admin && (
-        <nav className="cabinet-nav">
-          <ul className="cabinet-nav-list">
-            {CABINET_ITEMS.filter((item) => !item.adminOnly || admin).map((item) => (
+      <nav className="cabinet-nav">
+        <ul className="cabinet-nav-list">
+          {CABINET_ITEMS.filter((item) => !item.adminOnly || admin).map((item) => (
               <li key={item.path}>
                 <Link
                   to={item.path}
@@ -30,7 +32,6 @@ export default function CabinetLayout() {
             ))}
           </ul>
         </nav>
-      )}
       <div className="cabinet-content">
         <Outlet />
       </div>

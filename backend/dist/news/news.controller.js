@@ -14,6 +14,8 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NewsController = void 0;
 const common_1 = require("@nestjs/common");
+const jwt_auth_guard_1 = require("../auth/jwt-auth.guard");
+const admin_guard_1 = require("../auth/admin.guard");
 const news_service_1 = require("./news.service");
 let NewsController = class NewsController {
     newsService;
@@ -28,6 +30,12 @@ let NewsController = class NewsController {
         if (!item)
             return { error: 'Not found' };
         return item;
+    }
+    async remove(id) {
+        const ok = await this.newsService.remove(id);
+        if (!ok)
+            return { error: 'Not found' };
+        return { success: true };
     }
 };
 exports.NewsController = NewsController;
@@ -44,6 +52,14 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], NewsController.prototype, "findOne", null);
+__decorate([
+    (0, common_1.Delete)(':id'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, admin_guard_1.AdminGuard),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], NewsController.prototype, "remove", null);
 exports.NewsController = NewsController = __decorate([
     (0, common_1.Controller)('news'),
     __metadata("design:paramtypes", [news_service_1.NewsService])

@@ -42,6 +42,12 @@ let ContactController = class ContactController {
             return { error: 'Not found' };
         return item;
     }
+    async remove(id) {
+        const ok = await this.contactService.remove(id);
+        if (!ok)
+            return { error: 'Not found' };
+        return { success: true };
+    }
 };
 exports.ContactController = ContactController;
 __decorate([
@@ -66,6 +72,14 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], ContactController.prototype, "findOne", null);
+__decorate([
+    (0, common_1.Delete)(':id'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, admin_guard_1.AdminGuard),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], ContactController.prototype, "remove", null);
 exports.ContactController = ContactController = __decorate([
     (0, common_1.Controller)('contact'),
     __metadata("design:paramtypes", [contact_service_1.ContactService])

@@ -85,7 +85,7 @@ export default function CabinetProfilePage() {
           />
         </div>
         <div className="form-actions">
-          <button type="submit" className="btn" disabled={updateMutation.isPending}>
+          <button type="submit" className="btn btn-primary" disabled={updateMutation.isPending}>
             Сохранить
           </button>
           <button type="button" className="btn cabinet-logout" onClick={handleLogout}>

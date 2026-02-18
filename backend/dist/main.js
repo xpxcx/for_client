@@ -15,8 +15,12 @@ async function bootstrap() {
     app.use(cookieParser());
     const helmet = await import('helmet');
     app.use(helmet.default({ contentSecurityPolicy: false }));
+    const corsOrigins = ['http://localhost:5173', 'http://localhost:3000'];
+    if (process.env.FRONTEND_ORIGIN) {
+        corsOrigins.push(process.env.FRONTEND_ORIGIN);
+    }
     app.enableCors({
-        origin: ['http://localhost:5173', 'http://localhost:3000'],
+        origin: corsOrigins,
         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
         credentials: true,
     });

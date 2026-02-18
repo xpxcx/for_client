@@ -11,8 +11,11 @@ import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import CabinetLayout from './pages/cabinet/CabinetLayout'
 import CabinetProfilePage from './pages/cabinet/CabinetProfilePage'
-import CabinetAddPage from './pages/cabinet/CabinetAddPage'
 import CabinetManagePage from './pages/cabinet/CabinetManagePage'
+import CabinetMaterialsPage from './pages/cabinet/CabinetMaterialsPage'
+import CabinetNewsPage from './pages/cabinet/CabinetNewsPage'
+import CabinetLinksPage from './pages/cabinet/CabinetLinksPage'
+import CabinetContactInfoPage from './pages/cabinet/CabinetContactInfoPage'
 import './App.css'
 
 export default function App() {
@@ -35,20 +38,45 @@ export default function App() {
             }
           >
             <Route index element={<Navigate to="profile" replace />} />
+            <Route path="contacts" element={<Navigate to="/cabinet/profile" replace />} />
             <Route path="profile" element={<CabinetProfilePage />} />
-            <Route
-              path="add"
-              element={
-                <AdminRoute>
-                  <CabinetAddPage />
-                </AdminRoute>
-              }
-            />
             <Route
               path="manage"
               element={
                 <AdminRoute>
                   <CabinetManagePage />
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="materials"
+              element={
+                <AdminRoute>
+                  <CabinetMaterialsPage />
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="news"
+              element={
+                <AdminRoute>
+                  <CabinetNewsPage />
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="links"
+              element={
+                <AdminRoute>
+                  <CabinetLinksPage />
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="contact-info"
+              element={
+                <AdminRoute>
+                  <CabinetContactInfoPage />
                 </AdminRoute>
               }
             />

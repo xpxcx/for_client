@@ -40,3 +40,96 @@
 .cabinet-content {
   margin-top: 0.5rem;
 }
+
+.cabinet-hint {
+  color: #666;
+  font-size: 0.95rem;
+  margin: 0 0 1rem;
+}
+
+.cabinet-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.cabinet-list-item {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #eee;
+}
+
+.cabinet-list-item:last-child {
+  border-bottom: none;
+}
+
+.cabinet-list-desc {
+  margin: 0.35rem 0 0;
+  font-size: 0.95rem;
+  color: #444;
+}
+
+.cabinet-list-meta {
+  display: block;
+  font-size: 0.85rem;
+  color: #666;
+  margin-top: 0.25rem;
+}
+
+.cabinet-list-meta a {
+  color: #3498db;
+}
+
+.cabinet-list-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.cabinet-contact-message {
+  white-space: pre-wrap;
+  max-width: 40rem;
+}
+
+.contact-info-social-edit-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.contact-info-social-edit-header label {
+  margin: 0;
+}
+
+.contact-social-edit-item {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.contact-social-edit-fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.contact-social-edit-name {
+  flex: 1;
+  min-width: 140px;
+}
+
+.contact-social-edit-url {
+  flex: 2;
+  min-width: 200px;
+}
+
+.form-hint {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #666;
+}

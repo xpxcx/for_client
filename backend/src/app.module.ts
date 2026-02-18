@@ -10,6 +10,7 @@ import { NewsModule } from './news/news.module';
 import { ContactModule } from './contact/contact.module';
 import { MaterialsModule } from './materials/materials.module';
 import { LinksModule } from './links/links.module';
+import { ContactInfoModule } from './contact-info/contact-info.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { LinksModule } from './links/links.module';
     AchievementsModule,
     MaterialsModule,
     LinksModule,
+    ContactInfoModule,
   ],
   controllers: [AppController],
   providers: [AppService],

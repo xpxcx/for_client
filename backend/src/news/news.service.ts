@@ -38,6 +38,13 @@ export class NewsService {
     return row ? toResponse(row) : null;
   }
 
+  async remove(id: string): Promise<boolean> {
+    const numId = Number(id);
+    if (Number.isNaN(numId)) return false;
+    const result = await this.repo.delete(numId);
+    return (result.affected ?? 0) > 0;
+  }
+
   async createFromAchievement(
     achievementId: number,
     title: string,

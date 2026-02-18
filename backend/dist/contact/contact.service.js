@@ -53,6 +53,13 @@ let ContactService = class ContactService {
         const row = await this.repo.findOne({ where: { id: numId } });
         return row ? toResponse(row) : null;
     }
+    async remove(id) {
+        const numId = Number(id);
+        if (Number.isNaN(numId))
+            return false;
+        const result = await this.repo.delete(numId);
+        return (result.affected ?? 0) > 0;
+    }
 };
 exports.ContactService = ContactService;
 exports.ContactService = ContactService = __decorate([

@@ -19,4 +19,5 @@ export declare class ContactService {
     }): Promise<ContactItem>;
     findAll(): Promise<ContactItem[]>;
     findOne(id: string): Promise<ContactItem | null>;
+    remove(id: string): Promise<boolean>;
 }

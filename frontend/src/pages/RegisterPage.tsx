@@ -55,7 +55,7 @@ export default function RegisterPage() {
           </div>
           {error && <p className="error">{error}</p>}
           <div className="form-actions">
-            <button type="submit" className="btn" disabled={loading}>
+            <button type="submit" className="btn btn-primary" disabled={loading}>
               {loading ? 'Регистрация...' : 'Зарегистрироваться'}
             </button>
           </div>

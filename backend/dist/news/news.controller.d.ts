@@ -6,4 +6,11 @@ export declare class NewsController {
     findOne(id: string): Promise<import("./news.service").NewsItem | {
         error: string;
     }>;
+    remove(id: string): Promise<{
+        error: string;
+        success?: undefined;
+    } | {
+        success: boolean;
+        error?: undefined;
+    }>;
 }

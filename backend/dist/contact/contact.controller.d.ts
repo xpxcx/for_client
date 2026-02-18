@@ -16,4 +16,11 @@ export declare class ContactController {
     findOne(id: string): Promise<import("./contact.service").ContactItem | {
         error: string;
     }>;
+    remove(id: string): Promise<{
+        error: string;
+        success?: undefined;
+    } | {
+        success: boolean;
+        error?: undefined;
+    }>;
 }
