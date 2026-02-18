@@ -6,22 +6,22 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ContactModule = void 0;
+exports.LinksModule = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const auth_module_1 = require("../auth/auth.module");
-const contact_entity_1 = require("./contact.entity");
-const contact_controller_1 = require("./contact.controller");
-const contact_service_1 = require("./contact.service");
-let ContactModule = class ContactModule {
+const useful_link_entity_1 = require("./useful-link.entity");
+const links_controller_1 = require("./links.controller");
+const links_service_1 = require("./links.service");
+let LinksModule = class LinksModule {
 };
-exports.ContactModule = ContactModule;
-exports.ContactModule = ContactModule = __decorate([
+exports.LinksModule = LinksModule;
+exports.LinksModule = LinksModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([contact_entity_1.Contact]), auth_module_1.AuthModule],
-        controllers: [contact_controller_1.ContactController],
-        providers: [contact_service_1.ContactService],
-        exports: [contact_service_1.ContactService],
+        imports: [typeorm_1.TypeOrmModule.forFeature([useful_link_entity_1.UsefulLink]), auth_module_1.AuthModule],
+        controllers: [links_controller_1.LinksController],
+        providers: [links_service_1.LinksService],
+        exports: [links_service_1.LinksService],
     })
-], ContactModule);
-//# sourceMappingURL=contact.module.js.map
+], LinksModule);
+//# sourceMappingURL=links.module.js.map

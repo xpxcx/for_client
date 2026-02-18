@@ -1,3 +1,4 @@
+import { ContactService } from './contact.service';
 export declare class ContactDto {
     name: string;
     email: string;
@@ -5,8 +6,14 @@ export declare class ContactDto {
     message: string;
 }
 export declare class ContactController {
-    send(body: ContactDto): {
+    private readonly contactService;
+    constructor(contactService: ContactService);
+    send(body: ContactDto): Promise<{
         success: boolean;
         message: string;
-    };
+    }>;
+    findAll(): Promise<import("./contact.service").ContactItem[]>;
+    findOne(id: string): Promise<import("./contact.service").ContactItem | {
+        error: string;
+    }>;
 }

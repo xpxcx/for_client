@@ -6,22 +6,22 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ContactModule = void 0;
+exports.MaterialsModule = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const auth_module_1 = require("../auth/auth.module");
-const contact_entity_1 = require("./contact.entity");
-const contact_controller_1 = require("./contact.controller");
-const contact_service_1 = require("./contact.service");
-let ContactModule = class ContactModule {
+const material_entity_1 = require("./material.entity");
+const materials_controller_1 = require("./materials.controller");
+const materials_service_1 = require("./materials.service");
+let MaterialsModule = class MaterialsModule {
 };
-exports.ContactModule = ContactModule;
-exports.ContactModule = ContactModule = __decorate([
+exports.MaterialsModule = MaterialsModule;
+exports.MaterialsModule = MaterialsModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([contact_entity_1.Contact]), auth_module_1.AuthModule],
-        controllers: [contact_controller_1.ContactController],
-        providers: [contact_service_1.ContactService],
-        exports: [contact_service_1.ContactService],
+        imports: [typeorm_1.TypeOrmModule.forFeature([material_entity_1.Material]), auth_module_1.AuthModule],
+        controllers: [materials_controller_1.MaterialsController],
+        providers: [materials_service_1.MaterialsService],
+        exports: [materials_service_1.MaterialsService],
     })
-], ContactModule);
-//# sourceMappingURL=contact.module.js.map
+], MaterialsModule);
+//# sourceMappingURL=materials.module.js.map

@@ -14,6 +14,9 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ContactController = exports.ContactDto = void 0;
 const common_1 = require("@nestjs/common");
+const jwt_auth_guard_1 = require("../auth/jwt-auth.guard");
+const admin_guard_1 = require("../auth/admin.guard");
+const contact_service_1 = require("./contact.service");
 class ContactDto {
     name;
     email;
@@ -22,8 +25,22 @@ class ContactDto {
 }
 exports.ContactDto = ContactDto;
 let ContactController = class ContactController {
-    send(body) {
+    contactService;
+    constructor(contactService) {
+        this.contactService = contactService;
+    }
+    async send(body) {
+        await this.contactService.create(body);
         return { success: true, message: 'Сообщение принято' };
+    }
+    async findAll() {
+        return this.contactService.findAll();
+    }
+    async findOne(id) {
+        const item = await this.contactService.findOne(id);
+        if (!item)
+            return { error: 'Not found' };
+        return item;
     }
 };
 exports.ContactController = ContactController;
@@ -32,9 +49,25 @@ __decorate([
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [ContactDto]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], ContactController.prototype, "send", null);
+__decorate([
+    (0, common_1.Get)(),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, admin_guard_1.AdminGuard),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], ContactController.prototype, "findAll", null);
+__decorate([
+    (0, common_1.Get)(':id'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, admin_guard_1.AdminGuard),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], ContactController.prototype, "findOne", null);
 exports.ContactController = ContactController = __decorate([
-    (0, common_1.Controller)('contact')
+    (0, common_1.Controller)('contact'),
+    __metadata("design:paramtypes", [contact_service_1.ContactService])
 ], ContactController);
 //# sourceMappingURL=contact.controller.js.map

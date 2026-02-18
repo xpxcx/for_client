@@ -11,4 +11,4 @@ import { LinksService } from './links.service';
   providers: [LinksService],
   exports: [LinksService],
 })
-export class LinksModule {}
+export class LinksModule { }

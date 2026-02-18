@@ -17,6 +17,8 @@ const achievements_module_1 = require("./achievements/achievements.module");
 const content_module_1 = require("./content/content.module");
 const news_module_1 = require("./news/news.module");
 const contact_module_1 = require("./contact/contact.module");
+const materials_module_1 = require("./materials/materials.module");
+const links_module_1 = require("./links/links.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -39,6 +41,8 @@ exports.AppModule = AppModule = __decorate([
             news_module_1.NewsModule,
             contact_module_1.ContactModule,
             achievements_module_1.AchievementsModule,
+            materials_module_1.MaterialsModule,
+            links_module_1.LinksModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],
