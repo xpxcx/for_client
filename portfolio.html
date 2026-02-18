@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Сайт-портфолио педагога">
+    <title>Сайт-портфолио педагога</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --text-color: #333;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --font-size-base: 16px;
+            --font-size-large: 20px;
+            --font-size-small: 14px;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: var(--font-size-base);
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            transition: margin-left 0.3s ease;
+        }
+
+        body.menu-open {
+            overflow: hidden;
+        }
+
+        /* Кнопка меню */
+        .menu-toggle {
+            background-color: transparent;
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 0.5rem 0.75rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.5rem;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+        }
+
+        .menu-toggle:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.5);
+            box-shadow: 0 0 10px rgba(52, 152, 219, 0.5);
+        }
+
+        .menu-toggle:focus {
+            outline: 2px solid var(--secondary-color);
+            outline-offset: 2px;
+        }
+
+        .menu-toggle.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-color: var(--secondary-color);
+        }
+
+        /* Затемнение фона */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Боковое меню */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -320px;
+            width: 320px;
+            height: 100vh;
+            background-color: var(--primary-color);
+            z-index: 1000;
+            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 2px 0 15px rgba(0,0,0,0.3);
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .sidebar.open {
+            left: 0;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            background-color: rgba(0, 0, 0, 0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 60px;
+        }
+
+        .sidebar-header h2 {
+            color: white;
+            font-size: 1.5rem;
+            margin: 0;
+            border: none;
+            padding: 0;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: visible;
+        }
+
+        .sidebar-close {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.25rem 0.5rem;
+            border-radius: 3px;
+            transition: background-color 0.3s;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sidebar-close:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar-menu li {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-menu a {
+            display: block;
+            padding: 1rem 1.5rem;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: var(--font-size-base);
+            position: relative;
+            white-space: nowrap;
+            overflow: visible;
+        }
+
+        .sidebar-menu a::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background-color: var(--secondary-color);
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding-left: 2rem;
+        }
+
+        .sidebar-menu a:hover::before,
+        .sidebar-menu a.active::before {
+            transform: scaleY(1);
+        }
+
+        .sidebar-menu a:focus {
+            outline: 2px solid var(--secondary-color);
+            outline-offset: -2px;
+        }
+
+        /* Навигация */
+        nav {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 998;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            font-size: var(--font-size-large);
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.3s;
+            user-select: none;
+        }
+
+        .logo:hover {
+            opacity: 0.8;
+        }
+
+        /* Контейнер */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Секции страницы */
+        .page-section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .page-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Заголовки */
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            font-size: 2.5rem;
+        }
+
+        h2 {
+            color: var(--primary-color);
+            margin: 2rem 0 1rem;
+            font-size: 2rem;
+            border-bottom: 3px solid var(--secondary-color);
+            padding-bottom: 0.5rem;
+        }
+
+        h3 {
+            color: var(--primary-color);
+            margin: 1.5rem 0 0.5rem;
+            font-size: 1.5rem;
+        }
+
+        /* Герой-секция */
+        .hero {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+
+        .hero h1 {
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: var(--font-size-large);
+            margin-bottom: 2rem;
+        }
+
+        /* Карточки */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+
+        .card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+        }
+
+        /* Галерея */
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px;
+            aspect-ratio: 4/3;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.1);
+        }
+
+        /* Видео */
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            margin: 2rem 0;
+            border-radius: 8px;
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Форма обратной связи */
+        .contact-form {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin: 2rem 0;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: var(--font-size-base);
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+        }
+
+        .btn {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 5px;
+            font-size: var(--font-size-base);
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-color);
+        }
+
+        /* Новости */
+        .news-item {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--secondary-color);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .news-date {
+            color: #666;
+            font-size: var(--font-size-small);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Социальные сети */
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .social-links a {
+            color: var(--secondary-color);
+            text-decoration: none;
+            font-size: var(--font-size-large);
+            transition: color 0.3s;
+        }
+
+        .social-links a:hover {
+            color: var(--accent-color);
+        }
+
+        /* Достижения */
+        .achievements {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .achievement-badge {
+            background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        /* Футер */
+        footer {
+            background-color: var(--primary-color);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 4rem;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 280px;
+                left: -280px;
+            }
+
+            .nav-container {
+                padding: 0 1rem;
+            }
+
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .sidebar {
+                width: 100%;
+                left: -100%;
+            }
+        }
+
+        /* Доступность */
+        .skip-link {
+            position: absolute;
+            left: -9999px;
+            z-index: 999;
+        }
+
+        .skip-link:focus {
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 1rem;
+            background: var(--accent-color);
+            color: white;
+            text-decoration: none;
+        }
+
+        /* Карта сайта */
+        .sitemap {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 2rem 0;
+        }
+
+        .sitemap ul {
+            list-style: none;
+            padding-left: 1rem;
+        }
+
+        .sitemap a {
+            color: var(--secondary-color);
+            text-decoration: none;
+        }
+
+        .sitemap a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Перейти к основному содержимому</a>
+
+    <div class="overlay" aria-hidden="true"></div>
+
+    <aside class="sidebar" role="navigation" aria-label="Боковое меню">
+        <div class="sidebar-header">
+            <h2>МЕНЮ</h2>
+            <button class="sidebar-close" aria-label="Закрыть меню">×</button>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="#" data-section="home" class="menu-link">Главная</a></li>
+            <li><a href="#" data-section="about" class="menu-link">О себе</a></li>
+            <li><a href="#" data-section="materials" class="menu-link">Материалы</a></li>
+            <li><a href="#" data-section="achievements" class="menu-link">Достижения</a></li>
+            <li><a href="#" data-section="news" class="menu-link">Новости</a></li>
+            <li><a href="#" data-section="contact" class="menu-link">Контакты</a></li>
+            <li><a href="#" data-section="links" class="menu-link">Полезные ссылки</a></li>
+        </ul>
+    </aside>
+
+    <nav role="navigation" aria-label="Основная навигация">
+        <div class="nav-container">
+            <div class="nav-left">
+                <button class="menu-toggle" aria-label="Открыть меню" aria-expanded="false">
+                    ☰
+                </button>
+                <div class="logo">Портфолио педагога</div>
+            </div>
+        </div>
+    </nav>
+
+    <main id="main-content">
+        <section id="home" class="page-section active">
+            <div class="hero">
+                <h1>Добро пожаловать на сайт-портфолио</h1>
+                <p>Профессиональная деятельность педагога</p>
+            </div>
+            <div class="container">
+                <div class="card">
+                    <h2>Добро пожаловать!</h2>
+                    <p>На этом сайте вы найдете информацию о профессиональной деятельности педагога, материалы уроков, достижения и многое другое.</p>
+                    <p>Используйте боковое меню для навигации по разделам сайта.</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="container">
+            <section id="about" class="page-section">
+                <h2>О себе</h2>
+                <div class="card">
+                    <p>Здесь размещается информация о профессиональной деятельности педагога, его образовании, опыте работы и профессиональных интересах.</p>
+                    <div class="social-links">
+                        <a href="#" aria-label="ВКонтакте">VK</a>
+                        <a href="#" aria-label="Telegram">TG</a>
+                        <a href="#" aria-label="Email">Email</a>
+                    </div>
+                </div>
+            </section>
+
+            <section id="materials" class="page-section">
+                <h2>Материалы уроков и мероприятий</h2>
+                
+                <h3>Открытые уроки</h3>
+                <div class="card-grid">
+                    <div class="card">
+                        <img src="https://via.placeholder.com/400x200?text=Урок+1" alt="Открытый урок по математике">
+                        <h3>Открытый урок по математике</h3>
+                        <p>Краткое описание урока, тезисы и основные моменты. <a href="#">Подробнее</a></p>
+                    </div>
+                    <div class="card">
+                        <img src="https://via.placeholder.com/400x200?text=Урок+2" alt="Внеклассное мероприятие">
+                        <h3>Внеклассное мероприятие</h3>
+                        <p>Описание мероприятия с фотоматериалами и презентацией. <a href="#">Подробнее</a></p>
+                    </div>
+                    <div class="card">
+                        <img src="https://via.placeholder.com/400x200?text=Урок+3" alt="Мастер-класс">
+                        <h3>Мастер-класс для коллег</h3>
+                        <p>Видеоматериалы и презентация мастер-класса. <a href="#">Подробнее</a></p>
+                    </div>
+                </div>
+
+                <h3>Видеоматериалы</h3>
+                <div class="video-container">
+                    <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen
+                            title="Видео урока">
+                    </iframe>
+                </div>
+
+                <h3>Фотогалерея</h3>
+                <div class="gallery">
+                    <div class="gallery-item">
+                        <img src="https://via.placeholder.com/300x200?text=Фото+1" alt="Фото с мероприятия">
+                    </div>
+                    <div class="gallery-item">
+                        <img src="https://via.placeholder.com/300x200?text=Фото+2" alt="Фото с урока">
+                    </div>
+                    <div class="gallery-item">
+                        <img src="https://via.placeholder.com/300x200?text=Фото+3" alt="Фото с конкурса">
+                    </div>
+                    <div class="gallery-item">
+                        <img src="https://via.placeholder.com/300x200?text=Фото+4" alt="Фото с олимпиады">
+                    </div>
+                </div>
+
+                <h3>Презентации и документы</h3>
+                <div class="card">
+                    <ul>
+                        <li><a href="#" download>Презентация "Современные методы обучения" (PDF, 5 МБ)</a></li>
+                        <li><a href="#" download>Методическая разработка урока (DOCX, 2 МБ)</a></li>
+                        <li><a href="#" download>Рабочая программа (PDF, 3 МБ)</a></li>
+                    </ul>
+                    <p><small>Все материалы размещены с соблюдением авторских прав</small></p>
+                </div>
+            </section>
+
+            <section id="achievements" class="page-section">
+                <h2>Достижения</h2>
+                <h3>Достижения педагога</h3>
+                <div class="achievements">
+                    <div class="achievement-badge">Победитель конкурса "Учитель года"</div>
+                    <div class="achievement-badge">Грамота Министерства образования</div>
+                    <div class="achievement-badge">Публикации в научных журналах</div>
+                </div>
+
+                <h3>Достижения обучающихся</h3>
+                <div class="card-grid">
+                    <div class="card">
+                        <h3>Олимпиады</h3>
+                        <p>Участие и победы в олимпиадах различного уровня</p>
+                    </div>
+                    <div class="card">
+                        <h3>Конкурсы</h3>
+                        <p>Участие в творческих и научных конкурсах</p>
+                    </div>
+                    <div class="card">
+                        <h3>Проекты</h3>
+                        <p>Реализация учебных и исследовательских проектов</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="news" class="page-section">
+                <h2>Новости и актуальная информация</h2>
+                <div class="news-item">
+                    <div class="news-date">15 февраля 2026</div>
+                    <h3>Обновление материалов</h3>
+                    <p>Добавлены новые материалы открытых уроков и методические разработки.</p>
+                </div>
+                <div class="news-item">
+                    <div class="news-date">10 февраля 2026</div>
+                    <h3>Участие в конференции</h3>
+                    <p>Принял участие в региональной конференции педагогов. Материалы доступны в разделе "Материалы".</p>
+                </div>
+                <div class="news-item">
+                    <div class="news-date">5 февраля 2026</div>
+                    <h3>Новые достижения учеников</h3>
+                    <p>Поздравляем учеников с победой в городской олимпиаде!</p>
+                </div>
+            </section>
+
+            <section id="contact" class="page-section">
+                <h2>Обратная связь</h2>
+                <div class="contact-form">
+                    <form action="#" method="post">
+                        <div class="form-group">
+                            <label for="name">Ваше имя *</label>
+                            <input type="text" id="name" name="name" required aria-required="true">
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email *</label>
+                            <input type="email" id="email" name="email" required aria-required="true">
+                        </div>
+                        <div class="form-group">
+                            <label for="category">Категория</label>
+                            <select id="category" name="category" style="width: 100%; padding: 0.75rem; border: 2px solid #ddd; border-radius: 5px;">
+                                <option value="student">Обучающийся</option>
+                                <option value="parent">Родитель</option>
+                                <option value="colleague">Коллега</option>
+                                <option value="other">Другое</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="message">Сообщение *</label>
+                            <textarea id="message" name="message" rows="5" required aria-required="true"></textarea>
+                        </div>
+                        <button type="submit" class="btn">Отправить сообщение</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h3>Контактная информация</h3>
+                    <p><strong>Email:</strong> teacher@example.com</p>
+                    <p><strong>Телефон:</strong> +7 (XXX) XXX-XX-XX</p>
+                    <p><strong>Рабочее место:</strong> Название образовательной организации</p>
+                </div>
+            </section>
+
+            <section id="links" class="page-section">
+                <h2>Полезные ссылки</h2>
+                <div class="card">
+                    <h3>Профессиональные сообщества</h3>
+                    <ul>
+                        <li><a href="#" target="_blank" rel="noopener noreferrer">Сообщество педагогов региона</a></li>
+                        <li><a href="#" target="_blank" rel="noopener noreferrer">Профессиональный блог</a></li>
+                        <li><a href="#" target="_blank" rel="noopener noreferrer">Материалы конференций</a></li>
+                    </ul>
+
+                    <h3>Рекомендуемые интернет-сервисы</h3>
+                    <ul>
+                        <li><a href="#" target="_blank" rel="noopener noreferrer">Образовательная платформа 1</a></li>
+                        <li><a href="#" target="_blank" rel="noopener noreferrer">Образовательная платформа 2</a></li>
+                    </ul>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Сайт-портфолио педагога. Все права защищены.</p>
+        <p>Материалы размещены с соблюдением авторских прав</p>
+    </footer>
+
+    <script>
+        const menuToggle = document.querySelector('.menu-toggle');
+        const sidebar = document.querySelector('.sidebar');
+        const sidebarClose = document.querySelector('.sidebar-close');
+        const overlay = document.querySelector('.overlay');
+        const menuLinks = document.querySelectorAll('.menu-link');
+        const sections = document.querySelectorAll('.page-section');
+        const body = document.body;
+
+        function openMenu() {
+            sidebar.classList.add('open');
+            overlay.classList.add('active');
+            body.classList.add('menu-open');
+            menuToggle.classList.add('active');
+            menuToggle.setAttribute('aria-expanded', 'true');
+            menuToggle.setAttribute('aria-label', 'Закрыть меню');
+        }
+
+        function closeMenu() {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('active');
+            body.classList.remove('menu-open');
+            menuToggle.classList.remove('active');
+            menuToggle.setAttribute('aria-expanded', 'false');
+            menuToggle.setAttribute('aria-label', 'Открыть меню');
+        }
+
+        function showSection(sectionId) {
+            sections.forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            const targetSection = document.getElementById(sectionId);
+            if (targetSection) {
+                targetSection.classList.add('active');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            menuLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('data-section') === sectionId) {
+                    link.classList.add('active');
+                }
+            });
+        }
+
+        menuToggle.addEventListener('click', () => {
+            if (sidebar.classList.contains('open')) {
+                closeMenu();
+            } else {
+                openMenu();
+            }
+        });
+
+        if (sidebarClose) {
+            sidebarClose.addEventListener('click', closeMenu);
+        }
+
+        overlay.addEventListener('click', closeMenu);
+
+        menuLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const sectionId = link.getAttribute('data-section');
+                showSection(sectionId);
+                closeMenu();
+            });
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && sidebar.classList.contains('open')) {
+                closeMenu();
+            }
+        });
+
+        const logo = document.querySelector('.logo');
+        if (logo) {
+            logo.addEventListener('click', () => {
+                showSection('home');
+            });
+        }
+
+        window.addEventListener('load', () => {
+            showSection('home');
+        });
+    </script>
+</body>
+</html>

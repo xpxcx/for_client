@@ -1,3 +1,5 @@
+import { Repository } from 'typeorm';
+import { News } from './news.entity';
 export interface NewsItem {
     id: string;
     date: string;
@@ -5,7 +7,9 @@ export interface NewsItem {
     text: string;
 }
 export declare class NewsService {
-    private readonly items;
-    findAll(): NewsItem[];
-    findOne(id: string): NewsItem | null;
+    private readonly repo;
+    constructor(repo: Repository<News>);
+    findAll(): Promise<NewsItem[]>;
+    findOne(id: string): Promise<NewsItem | null>;
+    createFromAchievement(achievementId: number, title: string, description: string, date: string): Promise<NewsItem>;
 }

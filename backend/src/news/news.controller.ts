@@ -6,13 +6,13 @@ export class NewsController {
   constructor(private readonly newsService: NewsService) {}
 
   @Get()
-  findAll() {
+  async findAll() {
     return this.newsService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    const item = this.newsService.findOne(id);
+  async findOne(@Param('id') id: string) {
+    const item = await this.newsService.findOne(id);
     if (!item) return { error: 'Not found' };
     return item;
   }

@@ -1,4 +1,7 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { News } from './news.entity';
 
 export interface NewsItem {
   id: string;
@@ -7,34 +10,47 @@ export interface NewsItem {
   text: string;
 }
 
+function toResponse(row: News): NewsItem {
+  return {
+    id: String(row.id),
+    date: row.date,
+    title: row.title,
+    text: row.text,
+  };
+}
+
 @Injectable()
 export class NewsService {
-  private readonly items: NewsItem[] = [
-    {
-      id: '1',
-      date: '2026-02-15',
-      title: 'Обновление материалов',
-      text: 'Добавлены новые материалы открытых уроков и методические разработки.',
-    },
-    {
-      id: '2',
-      date: '2026-02-10',
-      title: 'Участие в конференции',
-      text: 'Принял участие в региональной конференции педагогов. Материалы доступны в разделе «Материалы».',
-    },
-    {
-      id: '3',
-      date: '2026-02-05',
-      title: 'Достижения учеников',
-      text: 'Поздравляем учеников с победой в городской олимпиаде!',
-    },
-  ];
+  constructor(
+    @InjectRepository(News)
+    private readonly repo: Repository<News>,
+  ) {}
 
-  findAll(): NewsItem[] {
-    return this.items;
+  async findAll(): Promise<NewsItem[]> {
+    const rows = await this.repo.find({ order: { date: 'DESC' } });
+    return rows.map(toResponse);
   }
 
-  findOne(id: string): NewsItem | null {
-    return this.items.find((n) => n.id === id) ?? null;
+  async findOne(id: string): Promise<NewsItem | null> {
+    const numId = Number(id);
+    if (Number.isNaN(numId)) return null;
+    const row = await this.repo.findOne({ where: { id: numId } });
+    return row ? toResponse(row) : null;
+  }
+
+  async createFromAchievement(
+    achievementId: number,
+    title: string,
+    description: string,
+    date: string,
+  ): Promise<NewsItem> {
+    const row = this.repo.create({
+      title,
+      text: description || title,
+      date,
+      achievementId,
+    });
+    const saved = await this.repo.save(row);
+    return toResponse(saved);
   }
 }

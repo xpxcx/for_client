@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link, Outlet, useLocation } from 'react-router-dom'
+import CookieNotice from './components/CookieNotice'
 import './Layout.css'
 
 interface Section {
@@ -16,6 +17,7 @@ const FALLBACK_SECTIONS: Section[] = [
   { id: 'news', title: 'Новости', path: '/news' },
   { id: 'contact', title: 'Контакты', path: '/contact' },
   { id: 'links', title: 'Полезные ссылки', path: '/links' },
+  { id: 'cabinet', title: 'Личный кабинет', path: '/cabinet' },
 ]
 
 export default function Layout() {
@@ -36,7 +38,7 @@ export default function Layout() {
     location.pathname === s.path || (s.path === '/' && location.pathname === '/')
 
   return (
-    <div className="layout">
+    <div className={`layout ${sidebarOpen ? 'sidebar-open' : ''}`}>
       <button
         type="button"
         className="menu-toggle"
@@ -79,12 +81,24 @@ export default function Layout() {
           <Link to="/" className="logo">
             Портфолио педагога
           </Link>
+          <Link
+            to="/cabinet"
+            className="cabinet-icon-link"
+            aria-label="Личный кабинет"
+            title="Личный кабинет"
+          >
+            <svg className="cabinet-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+          </Link>
         </div>
       </header>
 
       <main className="main">
         <Outlet />
       </main>
+      <CookieNotice />
     </div>
   )
 }

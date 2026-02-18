@@ -8,8 +8,12 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
+const throttler_1 = require("@nestjs/throttler");
+const typeorm_1 = require("@nestjs/typeorm");
 const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
+const auth_module_1 = require("./auth/auth.module");
+const achievements_module_1 = require("./achievements/achievements.module");
 const content_module_1 = require("./content/content.module");
 const news_module_1 = require("./news/news.module");
 const contact_module_1 = require("./contact/contact.module");
@@ -18,7 +22,24 @@ let AppModule = class AppModule {
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [content_module_1.ContentModule, news_module_1.NewsModule, contact_module_1.ContactModule],
+        imports: [
+            throttler_1.ThrottlerModule.forRoot([{ ttl: 60000, limit: 10 }]),
+            typeorm_1.TypeOrmModule.forRoot({
+                type: 'postgres',
+                host: process.env.DB_HOST ?? 'localhost',
+                port: parseInt(process.env.DB_PORT ?? '5432', 10),
+                username: process.env.DB_USER ?? 'postgres',
+                password: process.env.DB_PASSWORD ?? 'postgres',
+                database: process.env.DB_NAME ?? 'portfolio',
+                autoLoadEntities: true,
+                synchronize: true,
+            }),
+            auth_module_1.AuthModule,
+            content_module_1.ContentModule,
+            news_module_1.NewsModule,
+            contact_module_1.ContactModule,
+            achievements_module_1.AchievementsModule,
+        ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],
     })

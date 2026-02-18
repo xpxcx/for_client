@@ -20,11 +20,11 @@ let NewsController = class NewsController {
     constructor(newsService) {
         this.newsService = newsService;
     }
-    findAll() {
+    async findAll() {
         return this.newsService.findAll();
     }
-    findOne(id) {
-        const item = this.newsService.findOne(id);
+    async findOne(id) {
+        const item = await this.newsService.findOne(id);
         if (!item)
             return { error: 'Not found' };
         return item;
@@ -35,14 +35,14 @@ __decorate([
     (0, common_1.Get)(),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], NewsController.prototype, "findAll", null);
 __decorate([
     (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], NewsController.prototype, "findOne", null);
 exports.NewsController = NewsController = __decorate([
     (0, common_1.Controller)('news'),

@@ -22,6 +22,7 @@ export class ContentService {
     { id: 'news', title: 'Новости', path: '/news' },
     { id: 'contact', title: 'Контакты', path: '/contact' },
     { id: 'links', title: 'Полезные ссылки', path: '/links' },
+    { id: 'cabinet', title: 'Личный кабинет', path: '/cabinet' },
   ];
 
   private readonly content: Record<string, SectionContent> = {
