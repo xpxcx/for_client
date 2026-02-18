@@ -1,5 +1,7 @@
 # Портфолио: React + NestJS
 
+**Важно:** Сначала запустите backend, затем frontend. Иначе в консоли Vite будут ошибки `ECONNREFUSED` (прокси не может подключиться к порту 3000). Если backend не запущен, сайт всё равно откроется: меню подставится из запасного списка, на главной будет «Сервер недоступен».
+
 ## Запуск
 
 ### 1. Установка зависимостей
@@ -32,8 +34,10 @@ npm run dev
 ## API
 
 - `GET /api` — приветствие
-- `GET /api/content/sections` — список разделов
-- `GET /api/content/:id` — контент раздела (about, materials, achievements, news, contact, links)
+- `GET /api/content/sections` — список разделов меню
+- `GET /api/content/:id` — контент раздела (about, materials, achievements, links)
+- `GET /api/news` — список новостей
+- `POST /api/contact` — отправка формы обратной связи (body: name, email, category?, message)
 
 ## Структура
 

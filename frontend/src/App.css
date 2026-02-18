@@ -4,14 +4,20 @@
 
 .card {
   padding: 1.5rem 2rem;
-  background: rgba(255, 255, 255, 0.05);
+  background: #fff;
   border-radius: 8px;
   margin: 1rem 0;
   text-align: left;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
 }
 
 .error {
   color: #e74c3c;
+}
+
+.success {
+  color: #27ae60;
+  margin-top: 0.5rem;
 }
 
 .page {
@@ -46,4 +52,73 @@
 
 .page a {
   color: #3498db;
+}
+
+.news-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.news-item {
+  border-left: 4px solid #3498db;
+}
+
+.news-date {
+  color: #666;
+  font-size: 0.875rem;
+  margin-bottom: 0.25rem;
+}
+
+.news-title {
+  font-size: 1.25rem;
+  margin: 0 0 0.5rem 0;
+  color: #2c3e50;
+}
+
+.contact-form .form-group {
+  margin-bottom: 1rem;
+}
+
+.contact-form label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-weight: 500;
+  color: #2c3e50;
+}
+
+.contact-form input,
+.contact-form textarea,
+.contact-form select {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font: inherit;
+}
+
+.contact-form input:focus,
+.contact-form textarea:focus,
+.contact-form select:focus {
+  outline: none;
+  border-color: #3498db;
+}
+
+.contact-form .btn {
+  background: #3498db;
+  color: #fff;
+  border: none;
+  padding: 0.6rem 1.5rem;
+  border-radius: 6px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.contact-form .btn:hover:not(:disabled) {
+  background: #2c3e50;
+}
+
+.contact-form .btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }

@@ -6,21 +6,18 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AppModule = void 0;
+exports.NewsModule = void 0;
 const common_1 = require("@nestjs/common");
-const app_controller_1 = require("./app.controller");
-const app_service_1 = require("./app.service");
-const content_module_1 = require("./content/content.module");
-const news_module_1 = require("./news/news.module");
-const contact_module_1 = require("./contact/contact.module");
-let AppModule = class AppModule {
+const news_controller_1 = require("./news.controller");
+const news_service_1 = require("./news.service");
+let NewsModule = class NewsModule {
 };
-exports.AppModule = AppModule;
-exports.AppModule = AppModule = __decorate([
+exports.NewsModule = NewsModule;
+exports.NewsModule = NewsModule = __decorate([
     (0, common_1.Module)({
-        imports: [content_module_1.ContentModule, news_module_1.NewsModule, contact_module_1.ContactModule],
-        controllers: [app_controller_1.AppController],
-        providers: [app_service_1.AppService],
+        controllers: [news_controller_1.NewsController],
+        providers: [news_service_1.NewsService],
+        exports: [news_service_1.NewsService],
     })
-], AppModule);
-//# sourceMappingURL=app.module.js.map
+], NewsModule);
+//# sourceMappingURL=news.module.js.map

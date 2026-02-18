@@ -1,8 +1,14 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, Outlet, useLocation } from 'react-router-dom'
 import './Layout.css'
 
-const SECTIONS = [
+interface Section {
+  id: string
+  title: string
+  path: string
+}
+
+const FALLBACK_SECTIONS: Section[] = [
   { id: 'home', title: 'Главная', path: '/' },
   { id: 'about', title: 'О себе', path: '/about' },
   { id: 'materials', title: 'Материалы', path: '/materials' },
@@ -14,9 +20,20 @@ const SECTIONS = [
 
 export default function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [sections, setSections] = useState<Section[]>(FALLBACK_SECTIONS)
   const location = useLocation()
 
+  useEffect(() => {
+    fetch('/api/content/sections')
+      .then((res) => (res.ok ? res.json() : Promise.reject()))
+      .then(setSections)
+      .catch(() => setSections(FALLBACK_SECTIONS))
+  }, [])
+
   const closeSidebar = () => setSidebarOpen(false)
+
+  const isActive = (s: Section) =>
+    location.pathname === s.path || (s.path === '/' && location.pathname === '/')
 
   return (
     <div className="layout">
@@ -43,11 +60,11 @@ export default function Layout() {
           </button>
         </div>
         <ul className="sidebar-menu">
-          {SECTIONS.map((s) => (
+          {sections.map((s) => (
             <li key={s.id}>
               <Link
                 to={s.path}
-                className={location.pathname === s.path || (s.path === '/' && location.pathname === '/') ? 'active' : ''}
+                className={isActive(s) ? 'active' : ''}
                 onClick={closeSidebar}
               >
                 {s.title}
