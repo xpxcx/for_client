@@ -22,6 +22,20 @@ export async function fetchMaterials(): Promise<Material[]> {
   return res.json()
 }
 
+export async function uploadMaterialFile(file: File): Promise<{ fileUrl: string }> {
+  const formData = new FormData()
+  formData.append('file', file)
+  const res = await fetchWithAuth(`${API}/upload`, {
+    method: 'POST',
+    body: formData,
+  })
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}))
+    throw new Error(err.message || `Ошибка загрузки: ${res.status}`)
+  }
+  return res.json()
+}
+
 export async function createMaterial(data: {
   title: string
   description: string

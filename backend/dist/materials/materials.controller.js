@@ -14,13 +14,23 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MaterialsController = void 0;
 const common_1 = require("@nestjs/common");
+const platform_express_1 = require("@nestjs/platform-express");
+const multer_1 = require("multer");
+const path_1 = require("path");
 const jwt_auth_guard_1 = require("../auth/jwt-auth.guard");
 const admin_guard_1 = require("../auth/admin.guard");
 const materials_service_1 = require("./materials.service");
+const MATERIALS_UPLOAD_DIR = 'materials';
+const MAX_FILE_SIZE = 15 * 1024 * 1024;
 let MaterialsController = class MaterialsController {
     materialsService;
     constructor(materialsService) {
         this.materialsService = materialsService;
+    }
+    uploadFile(file) {
+        if (!file)
+            throw new common_1.BadRequestException('Файл не загружен');
+        return { fileUrl: `/uploads/${MATERIALS_UPLOAD_DIR}/${file.filename}` };
     }
     async findAll() {
         return this.materialsService.findAll();
@@ -48,6 +58,25 @@ let MaterialsController = class MaterialsController {
     }
 };
 exports.MaterialsController = MaterialsController;
+__decorate([
+    (0, common_1.Post)('upload'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, admin_guard_1.AdminGuard),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file', {
+        storage: (0, multer_1.diskStorage)({
+            destination: (0, path_1.join)(process.cwd(), 'uploads', MATERIALS_UPLOAD_DIR),
+            filename: (_, file, cb) => {
+                const ext = (file.originalname.match(/\.[^.]+$/) || ['.bin'])[0];
+                const name = `${Date.now()}-${Math.random().toString(36).slice(2)}${ext}`;
+                cb(null, name);
+            },
+        }),
+        limits: { fileSize: MAX_FILE_SIZE },
+    })),
+    __param(0, (0, common_1.UploadedFile)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], MaterialsController.prototype, "uploadFile", null);
 __decorate([
     (0, common_1.Get)(),
     __metadata("design:type", Function),

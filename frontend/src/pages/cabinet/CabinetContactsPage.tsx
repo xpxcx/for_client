@@ -65,7 +65,7 @@ export default function CabinetContactsPage() {
       <div className="card">
         <h3>Обращения</h3>
         {items.length === 0 ? (
-          <p>Обращений пока нет.</p>
+          <p className="cabinet-empty-message">Обращений пока нет.</p>
         ) : (
           <ul className="cabinet-list cabinet-contacts-list">
             {items.map((item: ContactItem) => (

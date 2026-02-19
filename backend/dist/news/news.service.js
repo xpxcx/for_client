@@ -23,6 +23,7 @@ function toResponse(row) {
         date: row.date,
         title: row.title,
         text: row.text,
+        sourceType: row.sourceType ?? (row.achievementId != null ? 'achievement' : null),
     };
 }
 let NewsService = class NewsService {
@@ -53,10 +54,42 @@ let NewsService = class NewsService {
             title,
             text: description || title,
             date,
+            sourceType: 'achievement',
             achievementId,
         });
         const saved = await this.repo.save(row);
         return toResponse(saved);
+    }
+    async createFromMaterial(materialId, title, description, date) {
+        const row = this.repo.create({
+            title,
+            text: description || title,
+            date,
+            sourceType: 'material',
+            materialId,
+        });
+        const saved = await this.repo.save(row);
+        return toResponse(saved);
+    }
+    async createFromLink(linkId, title, url, description, date) {
+        const text = description ? `${description}\n${url}` : url;
+        const row = this.repo.create({
+            title,
+            text,
+            date,
+            sourceType: 'link',
+            linkId,
+        });
+        const saved = await this.repo.save(row);
+        return toResponse(saved);
+    }
+    async hasNewsForMaterial(materialId) {
+        const count = await this.repo.count({ where: { materialId } });
+        return count > 0;
+    }
+    async hasNewsForLink(linkId) {
+        const count = await this.repo.count({ where: { linkId } });
+        return count > 0;
     }
 };
 exports.NewsService = NewsService;

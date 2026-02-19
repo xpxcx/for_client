@@ -16,6 +16,7 @@ exports.MaterialsService = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
+const news_service_1 = require("../news/news.service");
 const material_entity_1 = require("./material.entity");
 function toResponse(row) {
     return {
@@ -28,8 +29,10 @@ function toResponse(row) {
 }
 let MaterialsService = class MaterialsService {
     repo;
-    constructor(repo) {
+    newsService;
+    constructor(repo, newsService) {
         this.repo = repo;
+        this.newsService = newsService;
     }
     async findAll() {
         const rows = await this.repo.find({ order: { createdAt: 'DESC' } });
@@ -49,6 +52,13 @@ let MaterialsService = class MaterialsService {
             fileUrl: dto.fileUrl ?? null,
         });
         const saved = await this.repo.save(row);
+        const dateStr = saved.createdAt instanceof Date ? saved.createdAt.toISOString().slice(0, 10) : String(saved.createdAt).slice(0, 10);
+        try {
+            await this.newsService.createFromMaterial(saved.id, saved.title, saved.description, dateStr);
+        }
+        catch (err) {
+            console.error('Ошибка создания новости из материала:', err);
+        }
         return toResponse(saved);
     }
     async update(id, dto) {
@@ -79,6 +89,7 @@ exports.MaterialsService = MaterialsService;
 exports.MaterialsService = MaterialsService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(material_entity_1.Material)),
-    __metadata("design:paramtypes", [typeorm_2.Repository])
+    __metadata("design:paramtypes", [typeorm_2.Repository,
+        news_service_1.NewsService])
 ], MaterialsService);
 //# sourceMappingURL=materials.service.js.map

@@ -1,4 +1,5 @@
 import { Repository } from 'typeorm';
+import { NewsService } from '../news/news.service';
 import { UsefulLink } from './useful-link.entity';
 export interface UsefulLinkItem {
     id: string;
@@ -9,7 +10,8 @@ export interface UsefulLinkItem {
 }
 export declare class LinksService {
     private readonly repo;
-    constructor(repo: Repository<UsefulLink>);
+    private readonly newsService;
+    constructor(repo: Repository<UsefulLink>, newsService: NewsService);
     findAll(): Promise<UsefulLinkItem[]>;
     findOne(id: string): Promise<UsefulLinkItem | null>;
     create(dto: {

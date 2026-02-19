@@ -1,5 +1,6 @@
 import { Repository } from 'typeorm';
 import { Contact } from './contact.entity';
+import { TelegramService } from '../telegram/telegram.service';
 export interface ContactItem {
     id: string;
     name: string;
@@ -10,7 +11,8 @@ export interface ContactItem {
 }
 export declare class ContactService {
     private readonly repo;
-    constructor(repo: Repository<Contact>);
+    private readonly telegram;
+    constructor(repo: Repository<Contact>, telegram: TelegramService);
     create(dto: {
         name: string;
         email: string;

@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Contact } from './contact.entity';
+import { TelegramService } from '../telegram/telegram.service';
 
 export interface ContactItem {
   id: string;
@@ -28,6 +29,7 @@ export class ContactService {
   constructor(
     @InjectRepository(Contact)
     private readonly repo: Repository<Contact>,
+    private readonly telegram: TelegramService,
   ) {}
 
   async create(dto: { name: string; email: string; category?: string; message: string }): Promise<ContactItem> {
@@ -38,6 +40,11 @@ export class ContactService {
       message: dto.message,
     });
     const saved = await this.repo.save(row);
+    if (this.telegram.isConfigured()) {
+      this.telegram.sendContactNotification(dto).catch((err) => {
+        console.error('[Contact] Telegram notification failed:', err);
+      });
+    }
     return toResponse(saved);
   }
 

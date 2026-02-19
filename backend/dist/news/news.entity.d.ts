@@ -3,5 +3,8 @@ export declare class News {
     title: string;
     text: string;
     date: string;
+    sourceType: string | null;
     achievementId: number | null;
+    materialId: number | null;
+    linkId: number | null;
 }

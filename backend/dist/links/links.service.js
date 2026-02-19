@@ -16,6 +16,7 @@ exports.LinksService = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
+const news_service_1 = require("../news/news.service");
 const useful_link_entity_1 = require("./useful-link.entity");
 function toResponse(row) {
     return {
@@ -28,8 +29,10 @@ function toResponse(row) {
 }
 let LinksService = class LinksService {
     repo;
-    constructor(repo) {
+    newsService;
+    constructor(repo, newsService) {
         this.repo = repo;
+        this.newsService = newsService;
     }
     async findAll() {
         const rows = await this.repo.find({ order: { createdAt: 'DESC' } });
@@ -49,6 +52,13 @@ let LinksService = class LinksService {
             description: dto.description ?? null,
         });
         const saved = await this.repo.save(row);
+        const dateStr = saved.createdAt instanceof Date ? saved.createdAt.toISOString().slice(0, 10) : String(saved.createdAt).slice(0, 10);
+        try {
+            await this.newsService.createFromLink(saved.id, saved.title, saved.url, saved.description ?? undefined, dateStr);
+        }
+        catch (err) {
+            console.error('Ошибка создания новости из ссылки:', err);
+        }
         return toResponse(saved);
     }
     async update(id, dto) {
@@ -79,6 +89,7 @@ exports.LinksService = LinksService;
 exports.LinksService = LinksService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(useful_link_entity_1.UsefulLink)),
-    __metadata("design:paramtypes", [typeorm_2.Repository])
+    __metadata("design:paramtypes", [typeorm_2.Repository,
+        news_service_1.NewsService])
 ], LinksService);
 //# sourceMappingURL=links.service.js.map

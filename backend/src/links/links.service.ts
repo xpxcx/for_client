@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { NewsService } from '../news/news.service';
 import { UsefulLink } from './useful-link.entity';
 
 export interface UsefulLinkItem {
@@ -26,6 +27,7 @@ export class LinksService {
   constructor(
     @InjectRepository(UsefulLink)
     private readonly repo: Repository<UsefulLink>,
+    private readonly newsService: NewsService,
   ) {}
 
   async findAll(): Promise<UsefulLinkItem[]> {
@@ -47,6 +49,12 @@ export class LinksService {
       description: dto.description ?? null,
     });
     const saved = await this.repo.save(row);
+    const dateStr = saved.createdAt instanceof Date ? saved.createdAt.toISOString().slice(0, 10) : String(saved.createdAt).slice(0, 10);
+    try {
+      await this.newsService.createFromLink(saved.id, saved.title, saved.url, saved.description ?? undefined, dateStr);
+    } catch (err) {
+      console.error('Ошибка создания новости из ссылки:', err);
+    }
     return toResponse(saved);
   }
 

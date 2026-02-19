@@ -45,6 +45,12 @@ export default function Layout() {
       .catch(() => setSections(FALLBACK_SECTIONS))
   }, [])
 
+  useEffect(() => {
+    const handler = () => setSidebarOpen(true)
+    window.addEventListener('openSidebar', handler)
+    return () => window.removeEventListener('openSidebar', handler)
+  }, [])
+
   const closeSidebar = () => setSidebarOpen(false)
 
   const isActive = (s: Section) =>
@@ -92,7 +98,7 @@ export default function Layout() {
       <header className="header">
         <div className="nav-container">
           <Link to="/" className="logo">
-            Портфолио педагога
+            Сайт Крумовой Э.М.
           </Link>
           <Link
             to="/cabinet"

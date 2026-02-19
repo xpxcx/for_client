@@ -2,20 +2,22 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import Layout from './Layout'
 import ProtectedRoute from './components/ProtectedRoute'
 import AdminRoute from './components/AdminRoute'
-import ContentPage from './pages/ContentPage'
-import NewsPage from './pages/NewsPage'
-import ContactPage from './pages/ContactPage'
-import AchievementsPage from './pages/AchievementsPage'
-import LoginPage from './pages/LoginPage'
-import RegisterPage from './pages/RegisterPage'
-import CabinetLayout from './pages/cabinet/CabinetLayout'
-import CabinetProfilePage from './pages/cabinet/CabinetProfilePage'
-import CabinetManagePage from './pages/cabinet/CabinetManagePage'
-import CabinetMaterialsPage from './pages/cabinet/CabinetMaterialsPage'
-import CabinetNewsPage from './pages/cabinet/CabinetNewsPage'
-import CabinetLinksPage from './pages/cabinet/CabinetLinksPage'
-import CabinetContactInfoPage from './pages/cabinet/CabinetContactInfoPage'
+import ContentPage from './pages/ContentPage/ContentPage'
+import NewsPage from './pages/NewsPage/NewsPage'
+import ContactPage from './pages/ContactPage/ContactPage'
+import AchievementsPage from './pages/AchievementsPage/AchievementsPage'
+import MaterialsPage from './pages/MaterialsPage/MaterialsPage'
+import LoginPage from './pages/LoginPage/LoginPage'
+import RegisterPage from './pages/RegisterPage/RegisterPage'
+import CabinetLayout from './pages/cabinet/CabinetLayout/CabinetLayout'
+import CabinetProfilePage from './pages/cabinet/CabinetProfilePage/CabinetProfilePage'
+import CabinetManagePage from './pages/cabinet/CabinetManagePage/CabinetManagePage'
+import CabinetMaterialsPage from './pages/cabinet/CabinetMaterialsPage/CabinetMaterialsPage'
+import CabinetNewsPage from './pages/cabinet/CabinetNewsPage/CabinetNewsPage'
+import CabinetLinksPage from './pages/cabinet/CabinetLinksPage/CabinetLinksPage'
+import CabinetContactInfoPage from './pages/cabinet/CabinetContactInfoPage/CabinetContactInfoPage'
 import './App.css'
+import './AboutSection.css'
 
 export default function App() {
   return (
@@ -26,6 +28,7 @@ export default function App() {
           <Route path="news" element={<NewsPage />} />
           <Route path="contact" element={<ContactPage />} />
           <Route path="achievements" element={<AchievementsPage />} />
+          <Route path="materials" element={<MaterialsPage />} />
           <Route path="login" element={<LoginPage />} />
           <Route path="register" element={<RegisterPage />} />
           <Route

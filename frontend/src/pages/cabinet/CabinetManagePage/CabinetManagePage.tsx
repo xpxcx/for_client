@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useRef, useState } from 'react'
-import type { Achievement } from '../../api/achievements'
+import type { Achievement } from '../../../api/achievements'
 import {
   achievementsKeys,
   createAchievement,
@@ -8,7 +8,8 @@ import {
   fetchAchievements,
   updateAchievement,
   uploadImage,
-} from '../../api/achievements'
+} from '../../../api/achievements'
+import './CabinetManagePage.css'
 
 function formatDate(dateStr: string) {
   try {
@@ -287,12 +288,13 @@ export default function CabinetManagePage() {
         </div>
       )}
 
-      <h3>Список достижений</h3>
-      <div className="achievements-list">
+      <div className="card cabinet-list-card">
+        <h3>Список достижений</h3>
         {items.length === 0 ? (
-          <div className="card"><p>Достижений пока нет. Нажмите «Добавить достижение» выше.</p></div>
+          <p className="cabinet-empty-message">Достижений пока нет. Нажмите «Добавить достижение» выше.</p>
         ) : (
-          items.map((item) => (
+          <div className="achievements-list">
+          {items.map((item) => (
             <article key={item.id} className="card achievement-item achievement-card">
               <div className="achievement-actions">
                 <button
@@ -327,7 +329,8 @@ export default function CabinetManagePage() {
                 </div>
               </div>
             </article>
-          ))
+          ))}
+          </div>
         )}
       </div>
     </>

@@ -20,6 +20,7 @@ const contact_module_1 = require("./contact/contact.module");
 const materials_module_1 = require("./materials/materials.module");
 const links_module_1 = require("./links/links.module");
 const contact_info_module_1 = require("./contact-info/contact-info.module");
+const sync_news_module_1 = require("./sync-news/sync-news.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -45,6 +46,7 @@ exports.AppModule = AppModule = __decorate([
             materials_module_1.MaterialsModule,
             links_module_1.LinksModule,
             contact_info_module_1.ContactInfoModule,
+            sync_news_module_1.SyncNewsModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

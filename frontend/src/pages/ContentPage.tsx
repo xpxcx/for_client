@@ -7,6 +7,11 @@ interface Content {
   id: string
   title: string
   body: string
+  fullName?: string
+  birthDate?: string
+  imageUrl?: string
+  education?: string
+  experience?: string
 }
 
 export default function ContentPage() {
@@ -36,6 +41,47 @@ export default function ContentPage() {
 
   if (loading) return <section className="page"><div className="card"><p>Загрузка...</p></div></section>
   if (error || !content) return <section className="page"><div className="card"><p className="error">{error}</p></div></section>
+
+  if (id === 'about') {
+    return (
+      <section className="page content-page about-block">
+        <h1 className="about-block-title">{content.title}</h1>
+        <div className="about-block-inner card">
+          <div className="about-photo">
+            {content.imageUrl ? (
+              <img src={content.imageUrl} alt="" />
+            ) : (
+              <div className="about-photo-placeholder">Фото</div>
+            )}
+          </div>
+          <div className="about-right">
+            {(content.fullName || content.birthDate) && (
+              <div className="about-fio-block">
+                {content.fullName && <h2 className="about-fio">{content.fullName}</h2>}
+                {content.birthDate && <p className="about-birth-date">Дата рождения: {content.birthDate}</p>}
+              </div>
+            )}
+            {content.education != null && content.education !== '' && (
+              <div className="about-section">
+                <h3>Образование</h3>
+                <p>{content.education}</p>
+              </div>
+            )}
+            {content.experience != null && content.experience !== '' && (
+              <div className="about-section">
+                <h3>Опыт работы</h3>
+                <p>{content.experience}</p>
+              </div>
+            )}
+            <div className="about-section">
+              <h3>О себе</h3>
+              <p>{content.body}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    )
+  }
 
   return (
     <section className="page content-page">

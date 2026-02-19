@@ -37,7 +37,9 @@ npm run dev
 - `GET /api/content/sections` — список разделов меню
 - `GET /api/content/:id` — контент раздела (about, materials, achievements, links)
 - `GET /api/news` — список новостей
-- `POST /api/contact` — отправка формы обратной связи (body: name, email, category?, message)
+- `POST /api/contact` — отправка формы обратной связи (body: name, email, category?, message). При успешной отправке данные сохраняются в БД и дублируются в Telegram (если заданы переменные окружения).
+
+**Telegram:** чтобы заявки с формы обратной связи приходили в бота, в `backend/.env` укажите `TELEGRAM_BOT_TOKEN` (токен бота от @BotFather) и `TELEGRAM_CHAT_ID` (ID чата, куда слать уведомления). Как получить chat_id: напишите боту в Telegram любое сообщение (например /start), затем откройте в браузере `https://api.telegram.org/bot<ВАШ_ТОКЕН>/getUpdates` — в ответе в `message.chat.id` будет нужный ID.
 
 ## Структура
 

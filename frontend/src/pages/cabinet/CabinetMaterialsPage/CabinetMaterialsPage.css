@@ -1,0 +1,16 @@
+.form-group-file-upload {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.form-group-file-or {
+  color: #666;
+  font-size: 0.875rem;
+}
+
+.form-file-error {
+  margin-top: 0.35rem;
+  font-size: 0.875rem;
+}

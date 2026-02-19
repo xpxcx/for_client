@@ -1,4 +1,5 @@
 import { Repository } from 'typeorm';
+import { NewsService } from '../news/news.service';
 import { Material } from './material.entity';
 export interface MaterialItem {
     id: string;
@@ -9,7 +10,8 @@ export interface MaterialItem {
 }
 export declare class MaterialsService {
     private readonly repo;
-    constructor(repo: Repository<Material>);
+    private readonly newsService;
+    constructor(repo: Repository<Material>, newsService: NewsService);
     findAll(): Promise<MaterialItem[]>;
     findOne(id: string): Promise<MaterialItem | null>;
     create(dto: {

@@ -1,13 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
-import type { UsefulLink } from '../../api/links'
+import type { UsefulLink } from '../../../api/links'
 import {
   linksKeys,
   fetchLinks,
   createLink,
   updateLink,
   deleteLink,
-} from '../../api/links'
+} from '../../../api/links'
+import './CabinetLinksPage.css'
 
 const emptyForm = { title: '', url: '', description: '' }
 
@@ -217,7 +218,7 @@ export default function CabinetLinksPage() {
       <div className="card">
         <h3>Список ссылок</h3>
         {items.length === 0 ? (
-          <p>Ссылок пока нет.</p>
+          <p className="cabinet-empty-message">Ссылок пока нет.</p>
         ) : (
           <ul className="cabinet-list">
             {items.map((item) => (

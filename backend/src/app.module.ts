@@ -11,6 +11,7 @@ import { ContactModule } from './contact/contact.module';
 import { MaterialsModule } from './materials/materials.module';
 import { LinksModule } from './links/links.module';
 import { ContactInfoModule } from './contact-info/contact-info.module';
+import { SyncNewsModule } from './sync-news/sync-news.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { ContactInfoModule } from './contact-info/contact-info.module';
     MaterialsModule,
     LinksModule,
     ContactInfoModule,
+    SyncNewsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

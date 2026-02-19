@@ -7,10 +7,14 @@ const cookieParser = require('cookie-parser');
 import { join } from 'path';
 import { AppModule } from './app.module';
 
-const uploadsDir = join(process.cwd(), 'uploads', 'achievements');
-if (!existsSync(uploadsDir)) {
-  mkdirSync(uploadsDir, { recursive: true });
-}
+const uploadsDirs = [
+  join(process.cwd(), 'uploads', 'achievements'),
+  join(process.cwd(), 'uploads', 'profile'),
+  join(process.cwd(), 'uploads', 'materials'),
+];
+uploadsDirs.forEach((dir) => {
+  if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
+});
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);

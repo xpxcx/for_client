@@ -10,6 +10,7 @@ exports.LinksModule = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const auth_module_1 = require("../auth/auth.module");
+const news_module_1 = require("../news/news.module");
 const useful_link_entity_1 = require("./useful-link.entity");
 const links_controller_1 = require("./links.controller");
 const links_service_1 = require("./links.service");
@@ -18,7 +19,7 @@ let LinksModule = class LinksModule {
 exports.LinksModule = LinksModule;
 exports.LinksModule = LinksModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([useful_link_entity_1.UsefulLink]), auth_module_1.AuthModule],
+        imports: [typeorm_1.TypeOrmModule.forFeature([useful_link_entity_1.UsefulLink]), auth_module_1.AuthModule, news_module_1.NewsModule],
         controllers: [links_controller_1.LinksController],
         providers: [links_service_1.LinksService],
         exports: [links_service_1.LinksService],

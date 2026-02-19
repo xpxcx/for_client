@@ -1,13 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useState } from 'react'
-import type { Material } from '../../api/materials'
+import { useState, useRef } from 'react'
+import type { Material } from '../../../api/materials'
 import {
   materialsKeys,
   fetchMaterials,
   createMaterial,
   updateMaterial,
   deleteMaterial,
-} from '../../api/materials'
+  uploadMaterialFile,
+} from '../../../api/materials'
+import './CabinetMaterialsPage.css'
 
 const emptyForm = { title: '', description: '', fileUrl: '' }
 
@@ -15,7 +17,47 @@ export default function CabinetMaterialsPage() {
   const [form, setForm] = useState(emptyForm)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [showAdd, setShowAdd] = useState(false)
+  const [uploading, setUploading] = useState(false)
+  const [uploadError, setUploadError] = useState<string | null>(null)
+  const addFileRef = useRef<HTMLInputElement>(null)
+  const editFileRef = useRef<HTMLInputElement>(null)
   const queryClient = useQueryClient()
+
+  const handleFileAdd = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploadError(null)
+    setUploading(true)
+    uploadMaterialFile(file)
+      .then((r) => {
+        setForm((f) => ({ ...f, fileUrl: r.fileUrl }))
+        setUploading(false)
+        if (addFileRef.current) addFileRef.current.value = ''
+      })
+      .catch((err) => {
+        setUploadError(err instanceof Error ? err.message : 'Ошибка загрузки')
+        setUploading(false)
+        if (addFileRef.current) addFileRef.current.value = ''
+      })
+  }
+
+  const handleFileEdit = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploadError(null)
+    setUploading(true)
+    uploadMaterialFile(file)
+      .then((r) => {
+        setForm((f) => ({ ...f, fileUrl: r.fileUrl }))
+        setUploading(false)
+        if (editFileRef.current) editFileRef.current.value = ''
+      })
+      .catch((err) => {
+        setUploadError(err instanceof Error ? err.message : 'Ошибка загрузки')
+        setUploading(false)
+        if (editFileRef.current) editFileRef.current.value = ''
+      })
+  }
 
   const { data: items = [], isLoading, error } = useQuery({
     queryKey: materialsKeys.list(),
@@ -93,7 +135,7 @@ export default function CabinetMaterialsPage() {
   }
 
   const submitting =
-    createMutation.isPending || updateMutation.isPending || deleteMutation.isPending
+    createMutation.isPending || updateMutation.isPending || deleteMutation.isPending || uploading
   const mutationError = createMutation.error || updateMutation.error || deleteMutation.error
 
   if (isLoading)
@@ -141,13 +183,32 @@ export default function CabinetMaterialsPage() {
               />
             </div>
             <div className="form-group">
-              <label htmlFor="mat-add-url">Ссылка на файл</label>
+              <label htmlFor="mat-add-url">Ссылка на файл или загруженный файл</label>
               <input
                 id="mat-add-url"
                 value={form.fileUrl}
                 onChange={(e) => setForm((f) => ({ ...f, fileUrl: e.target.value }))}
-                placeholder="https://..."
+                placeholder="https://... или загрузите файл ниже"
               />
+              <div className="form-group-file-upload">
+                <span className="form-group-file-or">или</span>
+                <button
+                  type="button"
+                  className="btn btn-secondary btn-small"
+                  onClick={() => addFileRef.current?.click()}
+                  disabled={uploading}
+                >
+                  {uploading ? 'Загрузка...' : 'Выбрать файл'}
+                </button>
+                <input
+                  ref={addFileRef}
+                  type="file"
+                  accept="*/*"
+                  onChange={handleFileAdd}
+                  style={{ display: 'none' }}
+                />
+              </div>
+              {uploadError && <p className="error form-file-error">{uploadError}</p>}
             </div>
             <div className="form-actions">
               <button type="submit" className="btn btn-primary" disabled={submitting}>
@@ -190,12 +251,32 @@ export default function CabinetMaterialsPage() {
               />
             </div>
             <div className="form-group">
-              <label htmlFor="mat-edit-url">Ссылка на файл</label>
+              <label htmlFor="mat-edit-url">Ссылка на файл или загруженный файл</label>
               <input
                 id="mat-edit-url"
                 value={form.fileUrl}
                 onChange={(e) => setForm((f) => ({ ...f, fileUrl: e.target.value }))}
+                placeholder="https://... или загрузите файл ниже"
               />
+              <div className="form-group-file-upload">
+                <span className="form-group-file-or">или</span>
+                <button
+                  type="button"
+                  className="btn btn-secondary btn-small"
+                  onClick={() => editFileRef.current?.click()}
+                  disabled={uploading}
+                >
+                  {uploading ? 'Загрузка...' : 'Выбрать файл'}
+                </button>
+                <input
+                  ref={editFileRef}
+                  type="file"
+                  accept="*/*"
+                  onChange={handleFileEdit}
+                  style={{ display: 'none' }}
+                />
+              </div>
+              {uploadError && <p className="error form-file-error">{uploadError}</p>}
             </div>
             <div className="form-actions">
               <button type="submit" className="btn btn-primary" disabled={submitting}>
@@ -211,7 +292,7 @@ export default function CabinetMaterialsPage() {
       <div className="card">
         <h3>Список материалов</h3>
         {items.length === 0 ? (
-          <p>Материалов пока нет.</p>
+          <p className="cabinet-empty-message">Материалов пока нет.</p>
         ) : (
           <ul className="cabinet-list">
             {items.map((item) => (

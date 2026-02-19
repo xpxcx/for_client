@@ -16,7 +16,10 @@ let News = class News {
     title;
     text;
     date;
+    sourceType;
     achievementId;
+    materialId;
+    linkId;
 };
 exports.News = News;
 __decorate([
@@ -36,9 +39,21 @@ __decorate([
     __metadata("design:type", String)
 ], News.prototype, "date", void 0);
 __decorate([
+    (0, typeorm_1.Column)({ type: 'varchar', length: 50, nullable: true }),
+    __metadata("design:type", Object)
+], News.prototype, "sourceType", void 0);
+__decorate([
     (0, typeorm_1.Column)({ type: 'int', nullable: true }),
     __metadata("design:type", Object)
 ], News.prototype, "achievementId", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'int', nullable: true }),
+    __metadata("design:type", Object)
+], News.prototype, "materialId", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'int', nullable: true }),
+    __metadata("design:type", Object)
+], News.prototype, "linkId", void 0);
 exports.News = News = __decorate([
     (0, typeorm_1.Entity)('news')
 ], News);

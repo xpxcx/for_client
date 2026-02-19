@@ -10,6 +10,7 @@ exports.MaterialsModule = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const auth_module_1 = require("../auth/auth.module");
+const news_module_1 = require("../news/news.module");
 const material_entity_1 = require("./material.entity");
 const materials_controller_1 = require("./materials.controller");
 const materials_service_1 = require("./materials.service");
@@ -18,7 +19,7 @@ let MaterialsModule = class MaterialsModule {
 exports.MaterialsModule = MaterialsModule;
 exports.MaterialsModule = MaterialsModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([material_entity_1.Material]), auth_module_1.AuthModule],
+        imports: [typeorm_1.TypeOrmModule.forFeature([material_entity_1.Material]), auth_module_1.AuthModule, news_module_1.NewsModule],
         controllers: [materials_controller_1.MaterialsController],
         providers: [materials_service_1.MaterialsService],
         exports: [materials_service_1.MaterialsService],

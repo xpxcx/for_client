@@ -47,6 +47,20 @@
   margin: 0 0 1rem;
 }
 
+.cabinet-empty-message {
+  margin: 0;
+  color: #666;
+  font-size: 0.95rem;
+  font-weight: 400;
+}
+
+.cabinet-list-card h3 {
+  margin: 0 0 0.75rem;
+  font-size: 1.1rem;
+  color: #2c3e50;
+}
+
+
 .cabinet-list {
   list-style: none;
   margin: 0;
@@ -71,6 +85,14 @@
   margin: 0.35rem 0 0;
   font-size: 0.95rem;
   color: #444;
+}
+
+.cabinet-list-source {
+  display: block;
+  font-size: 0.8125rem;
+  color: #3498db;
+  font-weight: 500;
+  margin-bottom: 0.2rem;
 }
 
 .cabinet-list-meta {
@@ -132,4 +154,30 @@
   margin: 0;
   font-size: 0.9rem;
   color: #666;
+}
+
+@media (max-width: 768px) {
+  .cabinet-nav {
+    margin-left: -0.5rem;
+    margin-right: -0.5rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+
+  .cabinet-nav-list {
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+    padding: 0 0.5rem 0.25rem;
+    width: max-content;
+    min-width: 100%;
+  }
+
+  .cabinet-nav-list li {
+    flex-shrink: 0;
+  }
+
+  .cabinet-nav-list a {
+    white-space: nowrap;
+  }
 }

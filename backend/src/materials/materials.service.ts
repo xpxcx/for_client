@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { NewsService } from '../news/news.service';
 import { Material } from './material.entity';
 
 export interface MaterialItem {
@@ -26,6 +27,7 @@ export class MaterialsService {
   constructor(
     @InjectRepository(Material)
     private readonly repo: Repository<Material>,
+    private readonly newsService: NewsService,
   ) {}
 
   async findAll(): Promise<MaterialItem[]> {
@@ -47,6 +49,12 @@ export class MaterialsService {
       fileUrl: dto.fileUrl ?? null,
     });
     const saved = await this.repo.save(row);
+    const dateStr = saved.createdAt instanceof Date ? saved.createdAt.toISOString().slice(0, 10) : String(saved.createdAt).slice(0, 10);
+    try {
+      await this.newsService.createFromMaterial(saved.id, saved.title, saved.description, dateStr);
+    } catch (err) {
+      console.error('Ошибка создания новости из материала:', err);
+    }
     return toResponse(saved);
   }
 

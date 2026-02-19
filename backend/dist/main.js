@@ -6,10 +6,15 @@ const core_1 = require("@nestjs/core");
 const cookieParser = require('cookie-parser');
 const path_1 = require("path");
 const app_module_1 = require("./app.module");
-const uploadsDir = (0, path_1.join)(process.cwd(), 'uploads', 'achievements');
-if (!(0, fs_1.existsSync)(uploadsDir)) {
-    (0, fs_1.mkdirSync)(uploadsDir, { recursive: true });
-}
+const uploadsDirs = [
+    (0, path_1.join)(process.cwd(), 'uploads', 'achievements'),
+    (0, path_1.join)(process.cwd(), 'uploads', 'profile'),
+    (0, path_1.join)(process.cwd(), 'uploads', 'materials'),
+];
+uploadsDirs.forEach((dir) => {
+    if (!(0, fs_1.existsSync)(dir))
+        (0, fs_1.mkdirSync)(dir, { recursive: true });
+});
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
     app.use(cookieParser());

@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import type { NewsItem } from '../../api/news'
-import { newsKeys, fetchNews, deleteNews } from '../../api/news'
+import type { NewsItem } from '../../../api/news'
+import { newsKeys, fetchNews, deleteNews, syncNews } from '../../../api/news'
+import './CabinetNewsPage.css'
 
 function formatDate(dateStr: string) {
   try {
@@ -8,6 +9,19 @@ function formatDate(dateStr: string) {
     return d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })
   } catch {
     return dateStr
+  }
+}
+
+function getNewsSourceLabel(sourceType: string | null | undefined): string {
+  switch (sourceType) {
+    case 'achievement':
+      return 'Достижение'
+    case 'material':
+      return 'Материал'
+    case 'link':
+      return 'Ссылка'
+    default:
+      return 'Новость'
   }
 }
 
@@ -20,6 +34,13 @@ export default function CabinetNewsPage() {
 
   const deleteMutation = useMutation({
     mutationFn: deleteNews,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: newsKeys.list() })
+    },
+  })
+
+  const syncMutation = useMutation({
+    mutationFn: syncNews,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: newsKeys.list() })
     },
@@ -56,17 +77,37 @@ export default function CabinetNewsPage() {
     <>
       <h2>Управление новостями</h2>
       <p className="cabinet-hint">
-        Новости создаются автоматически при добавлении достижений за последнюю неделю. Здесь можно только просматривать и удалять.
+        Новости создаются автоматически при добавлении достижений, материалов и ссылок. Для уже добавленных ранее материалов и ссылок нажмите «Синхронизировать новости».
       </p>
+      <button
+        type="button"
+        className="btn btn-primary"
+        onClick={() => syncMutation.mutate()}
+        disabled={syncMutation.isPending}
+        style={{ marginBottom: '1rem' }}
+      >
+        {syncMutation.isPending ? 'Синхронизация...' : 'Синхронизировать новости'}
+      </button>
+      {syncMutation.isSuccess && syncMutation.data && (
+        <p className="success" style={{ marginBottom: '1rem' }}>
+          Создано новостей: {syncMutation.data.created}.
+        </p>
+      )}
+      {syncMutation.error && (
+        <p className="error" style={{ marginBottom: '1rem' }}>
+          {syncMutation.error instanceof Error ? syncMutation.error.message : 'Ошибка синхронизации'}
+        </p>
+      )}
       <div className="card">
         <h3>Список новостей</h3>
         {items.length === 0 ? (
-          <p>Новостей пока нет.</p>
+          <p className="cabinet-empty-message">Новостей пока нет.</p>
         ) : (
           <ul className="cabinet-list">
             {items.map((item: NewsItem) => (
               <li key={item.id} className="cabinet-list-item">
                 <div>
+                  <span className="cabinet-list-source">{getNewsSourceLabel(item.sourceType)}</span>
                   <strong>{item.title}</strong>
                   <span className="cabinet-list-meta">{formatDate(item.date)}</span>
                   {item.text && <p className="cabinet-list-desc">{item.text}</p>}

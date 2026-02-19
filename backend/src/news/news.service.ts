@@ -8,6 +8,7 @@ export interface NewsItem {
   date: string;
   title: string;
   text: string;
+  sourceType: string | null;
 }
 
 function toResponse(row: News): NewsItem {
@@ -16,6 +17,7 @@ function toResponse(row: News): NewsItem {
     date: row.date,
     title: row.title,
     text: row.text,
+    sourceType: row.sourceType ?? (row.achievementId != null ? 'achievement' : null),
   };
 }
 
@@ -55,9 +57,56 @@ export class NewsService {
       title,
       text: description || title,
       date,
+      sourceType: 'achievement',
       achievementId,
     });
     const saved = await this.repo.save(row);
     return toResponse(saved);
+  }
+
+  async createFromMaterial(
+    materialId: number,
+    title: string,
+    description: string,
+    date: string,
+  ): Promise<NewsItem> {
+    const row = this.repo.create({
+      title,
+      text: description || title,
+      date,
+      sourceType: 'material',
+      materialId,
+    });
+    const saved = await this.repo.save(row);
+    return toResponse(saved);
+  }
+
+  async createFromLink(
+    linkId: number,
+    title: string,
+    url: string,
+    description: string | undefined,
+    date: string,
+  ): Promise<NewsItem> {
+    const text = description ? `${description}\n${url}` : url;
+    const row = this.repo.create({
+      title,
+      text,
+      date,
+      sourceType: 'link',
+      linkId,
+    });
+    const saved = await this.repo.save(row);
+    return toResponse(saved);
+  }
+
+  async hasNewsForMaterial(materialId: number): Promise<boolean> {
+    const count = await this.repo.count({ where: { materialId } });
+    return count > 0;
+  }
+
+  async hasNewsForLink(linkId: number): Promise<boolean> {
+    const count = await this.repo.count({ where: { linkId } });
+    return count > 0;
   }
 }

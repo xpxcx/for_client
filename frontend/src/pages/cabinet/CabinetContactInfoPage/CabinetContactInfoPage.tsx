@@ -1,11 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState, useEffect } from 'react'
-import type { SocialNetworkItem } from '../../api/contact-info'
+import type { SocialNetworkItem } from '../../../api/contact-info'
 import {
   contactInfoKeys,
   fetchContactInfo,
   updateContactInfo,
-} from '../../api/contact-info'
+} from '../../../api/contact-info'
+import './CabinetContactInfoPage.css'
 
 export default function CabinetContactInfoPage() {
   const queryClient = useQueryClient()

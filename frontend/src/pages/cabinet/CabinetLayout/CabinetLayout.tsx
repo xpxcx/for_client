@@ -1,9 +1,9 @@
 import { Link, Outlet, useLocation } from 'react-router-dom'
-import { isAdmin } from '../../api/auth'
+import { isAdmin } from '../../../api/auth'
 import './CabinetLayout.css'
 
 const CABINET_ITEMS = [
-  { path: '/cabinet/profile', label: 'Информация о профиле', adminOnly: false },
+  { path: '/cabinet/profile', label: 'Управление профилем', adminOnly: false },
   { path: '/cabinet/manage', label: 'Управление достижениями', adminOnly: true },
   { path: '/cabinet/materials', label: 'Управление материалами', adminOnly: true },
   { path: '/cabinet/news', label: 'Управление новостями', adminOnly: true },

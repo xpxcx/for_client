@@ -1,11 +1,49 @@
-import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { join } from 'path';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { AdminGuard } from '../auth/admin.guard';
 import { MaterialsService } from './materials.service';
 
+const MATERIALS_UPLOAD_DIR = 'materials';
+const MAX_FILE_SIZE = 15 * 1024 * 1024;
+
 @Controller('materials')
 export class MaterialsController {
   constructor(private readonly materialsService: MaterialsService) {}
+
+  @Post('upload')
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: join(process.cwd(), 'uploads', MATERIALS_UPLOAD_DIR),
+        filename: (_, file, cb) => {
+          const ext = (file.originalname.match(/\.[^.]+$/) || ['.bin'])[0];
+          const name = `${Date.now()}-${Math.random().toString(36).slice(2)}${ext}`;
+          cb(null, name);
+        },
+      }),
+      limits: { fileSize: MAX_FILE_SIZE },
+    }),
+  )
+  uploadFile(@UploadedFile() file: Express.Multer.File) {
+    if (!file) throw new BadRequestException('Файл не загружен');
+    return { fileUrl: `/uploads/${MATERIALS_UPLOAD_DIR}/${file.filename}` };
+  }
 
   @Get()
   async findAll() {

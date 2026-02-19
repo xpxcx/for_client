@@ -10,6 +10,7 @@ exports.ContactModule = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const auth_module_1 = require("../auth/auth.module");
+const telegram_module_1 = require("../telegram/telegram.module");
 const contact_entity_1 = require("./contact.entity");
 const contact_controller_1 = require("./contact.controller");
 const contact_service_1 = require("./contact.service");
@@ -18,7 +19,7 @@ let ContactModule = class ContactModule {
 exports.ContactModule = ContactModule;
 exports.ContactModule = ContactModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([contact_entity_1.Contact]), auth_module_1.AuthModule],
+        imports: [typeorm_1.TypeOrmModule.forFeature([contact_entity_1.Contact]), auth_module_1.AuthModule, telegram_module_1.TelegramModule],
         controllers: [contact_controller_1.ContactController],
         providers: [contact_service_1.ContactService],
         exports: [contact_service_1.ContactService],

@@ -2,6 +2,9 @@ import { MaterialsService } from './materials.service';
 export declare class MaterialsController {
     private readonly materialsService;
     constructor(materialsService: MaterialsService);
+    uploadFile(file: Express.Multer.File): {
+        fileUrl: string;
+    };
     findAll(): Promise<import("./materials.service").MaterialItem[]>;
     findOne(id: string): Promise<import("./materials.service").MaterialItem | {
         error: string;
