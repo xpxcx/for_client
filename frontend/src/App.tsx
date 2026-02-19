@@ -2,7 +2,6 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import Layout from './Layout'
 import ProtectedRoute from './components/ProtectedRoute'
 import AdminRoute from './components/AdminRoute'
-import HomePage from './pages/HomePage'
 import ContentPage from './pages/ContentPage'
 import NewsPage from './pages/NewsPage'
 import ContactPage from './pages/ContactPage'
@@ -23,7 +22,7 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Layout />}>
-          <Route index element={<HomePage />} />
+          <Route index element={<ContentPage />} />
           <Route path="news" element={<NewsPage />} />
           <Route path="contact" element={<ContactPage />} />
           <Route path="achievements" element={<AchievementsPage />} />

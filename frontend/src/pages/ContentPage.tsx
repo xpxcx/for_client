@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useLocation } from 'react-router-dom'
 
 const API = '/api/content'
 
@@ -10,7 +10,9 @@ interface Content {
 }
 
 export default function ContentPage() {
-  const { id } = useParams<{ id: string }>()
+  const { id: paramId } = useParams<{ id: string }>()
+  const location = useLocation()
+  const id = paramId ?? (location.pathname === '/' ? 'about' : null)
   const [content, setContent] = useState<Content | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)

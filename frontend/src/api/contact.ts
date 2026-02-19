@@ -30,3 +30,21 @@ export async function deleteContact(id: string): Promise<void> {
     throw new Error(err.message || `Ошибка: ${res.status}`)
   }
 }
+
+export async function sendContactForm(data: {
+  name: string
+  email: string
+  category?: string
+  message: string
+}): Promise<{ success: boolean; message: string }> {
+  const res = await fetch(API, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  })
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}))
+    throw new Error(err.message || 'Ошибка отправки сообщения')
+  }
+  return res.json()
+}

@@ -10,15 +10,23 @@ interface Section {
 }
 
 const FALLBACK_SECTIONS: Section[] = [
-  { id: 'home', title: 'Главная', path: '/' },
-  { id: 'about', title: 'О себе', path: '/about' },
-  { id: 'materials', title: 'Материалы', path: '/materials' },
+  { id: 'about', title: 'О себе', path: '/' },
   { id: 'achievements', title: 'Достижения', path: '/achievements' },
+  { id: 'materials', title: 'Материалы', path: '/materials' },
   { id: 'news', title: 'Новости', path: '/news' },
   { id: 'contact', title: 'Контакты', path: '/contact' },
   { id: 'links', title: 'Полезные ссылки', path: '/links' },
-  { id: 'cabinet', title: 'Личный кабинет', path: '/cabinet' },
 ]
+
+const PAGE_TITLES: Record<string, string> = {
+  '/': 'О себе — Портфолио педагога',
+  '/about': 'О себе — Портфолио педагога',
+  '/achievements': 'Достижения — Портфолио педагога',
+  '/news': 'Новости — Портфолио педагога',
+  '/contact': 'Контакты — Портфолио педагога',
+  '/materials': 'Материалы — Портфолио педагога',
+  '/links': 'Полезные ссылки — Портфолио педагога',
+}
 
 export default function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -26,9 +34,14 @@ export default function Layout() {
   const location = useLocation()
 
   useEffect(() => {
+    const title = PAGE_TITLES[location.pathname] ?? 'Портфолио педагога'
+    document.title = title
+  }, [location.pathname])
+
+  useEffect(() => {
     fetch('/api/content/sections')
       .then((res) => (res.ok ? res.json() : Promise.reject()))
-      .then(setSections)
+      .then((list: Section[]) => setSections(list.filter((s) => s.id !== 'home' && s.id !== 'cabinet')))
       .catch(() => setSections(FALLBACK_SECTIONS))
   }, [])
 

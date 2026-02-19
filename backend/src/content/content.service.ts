@@ -15,14 +15,12 @@ export interface SectionContent {
 @Injectable()
 export class ContentService {
   private readonly sections: Section[] = [
-    { id: 'home', title: 'Главная', path: '/' },
-    { id: 'about', title: 'О себе', path: '/about' },
-    { id: 'materials', title: 'Материалы', path: '/materials' },
+    { id: 'about', title: 'О себе', path: '/' },
     { id: 'achievements', title: 'Достижения', path: '/achievements' },
+    { id: 'materials', title: 'Материалы', path: '/materials' },
     { id: 'news', title: 'Новости', path: '/news' },
     { id: 'contact', title: 'Контакты', path: '/contact' },
     { id: 'links', title: 'Полезные ссылки', path: '/links' },
-    { id: 'cabinet', title: 'Личный кабинет', path: '/cabinet' },
   ];
 
   private readonly content: Record<string, SectionContent> = {

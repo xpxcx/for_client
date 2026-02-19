@@ -1,5 +1,7 @@
+import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { fetchContactInfo, contactInfoKeys } from '../api/contact-info'
+import { sendContactForm } from '../api/contact'
 import './ContactPage.css'
 
 export default function ContactPage() {
@@ -7,6 +9,31 @@ export default function ContactPage() {
     queryKey: contactInfoKeys.get(),
     queryFn: fetchContactInfo,
   })
+
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    category: 'student',
+    message: '',
+  })
+  const [formStatus, setFormStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle')
+  const [formError, setFormError] = useState<string | null>(null)
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setFormStatus('sending')
+    setFormError(null)
+
+    try {
+      await sendContactForm(formData)
+      setFormStatus('success')
+      setFormData({ name: '', email: '', category: 'student', message: '' })
+      setTimeout(() => setFormStatus('idle'), 3000)
+    } catch (err) {
+      setFormStatus('error')
+      setFormError(err instanceof Error ? err.message : 'Ошибка отправки сообщения')
+    }
+  }
 
   return (
     <section className="page contact-page">
@@ -60,6 +87,74 @@ export default function ContactPage() {
           </div>
         </div>
       )}
+
+      <div className="contact-form-block">
+        <div className="card contact-form-card">
+          <h2>Обратная связь</h2>
+          <form className="contact-form" onSubmit={handleSubmit}>
+            <div className="form-group">
+              <label htmlFor="contact-form-name">Имя *</label>
+              <input
+                id="contact-form-name"
+                type="text"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                required
+                disabled={formStatus === 'sending'}
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="contact-form-email">Email *</label>
+              <input
+                id="contact-form-email"
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                required
+                disabled={formStatus === 'sending'}
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="contact-form-category">Категория</label>
+              <select
+                id="contact-form-category"
+                value={formData.category}
+                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                disabled={formStatus === 'sending'}
+              >
+                <option value="student">Обучающийся</option>
+                <option value="parent">Родитель</option>
+                <option value="colleague">Коллега</option>
+                <option value="other">Другое</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label htmlFor="contact-form-message">Сообщение *</label>
+              <textarea
+                id="contact-form-message"
+                rows={5}
+                value={formData.message}
+                onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                required
+                disabled={formStatus === 'sending'}
+              />
+            </div>
+            {formStatus === 'error' && formError && (
+              <div className="form-error">
+                <p className="error">{formError}</p>
+              </div>
+            )}
+            {formStatus === 'success' && (
+              <div className="form-success">
+                <p className="success">Сообщение отправлено успешно!</p>
+              </div>
+            )}
+            <button type="submit" className="btn" disabled={formStatus === 'sending'}>
+              {formStatus === 'sending' ? 'Отправка...' : 'Отправить'}
+            </button>
+          </form>
+        </div>
+      </div>
     </section>
   )
 }
