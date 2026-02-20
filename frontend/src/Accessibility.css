@@ -1,0 +1,121 @@
+.accessibility-mode {
+  font-size: 18px;
+}
+
+.accessibility-mode body,
+.accessibility-mode #root {
+  font-size: 1.125rem;
+}
+
+.accessibility-mode .main {
+  font-size: 1.25rem;
+  line-height: 1.65;
+  letter-spacing: 0.02em;
+}
+
+.accessibility-mode .page h1,
+.accessibility-mode .card h1,
+.accessibility-mode .card h2 {
+  font-size: 1.75rem;
+  color: #000;
+  font-weight: 700;
+}
+
+.accessibility-mode .page h2,
+.accessibility-mode .card h3 {
+  font-size: 1.5rem;
+  color: #000;
+  font-weight: 700;
+}
+
+.accessibility-mode .page h3 {
+  font-size: 1.35rem;
+  color: #111;
+  font-weight: 600;
+}
+
+.accessibility-mode .card {
+  border: 2px solid #333;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.accessibility-mode .contact-form label,
+.accessibility-mode .contact-form input,
+.accessibility-mode .contact-form textarea,
+.accessibility-mode .contact-form select {
+  font-size: 1.125rem;
+}
+
+.accessibility-mode .contact-form label,
+.accessibility-mode .form-group label {
+  color: #000;
+  font-weight: 600;
+}
+
+.accessibility-mode .news-date,
+.accessibility-mode .news-title,
+.accessibility-mode .achievement-date,
+.accessibility-mode .achievement-title,
+.accessibility-mode .achievement-desc,
+.accessibility-mode .achievement-info-label,
+.accessibility-mode .achievement-info-value,
+.accessibility-mode .achievement-info-desc {
+  color: #111;
+}
+
+.accessibility-mode .news-date,
+.accessibility-mode .achievement-date {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.accessibility-mode .news-title,
+.accessibility-mode .achievement-title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #000;
+}
+
+.accessibility-mode .news-item {
+  border-left-width: 5px;
+  border-left-color: #000;
+}
+
+.accessibility-mode .page a,
+.accessibility-mode .card a {
+  color: #0066cc;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.accessibility-mode .btn {
+  font-size: 1.125rem;
+  padding: 0.75rem 1.5rem;
+  border-width: 2px;
+  font-weight: 600;
+}
+
+.accessibility-mode .contact-form input,
+.accessibility-mode .contact-form textarea,
+.accessibility-mode .contact-form select {
+  border-width: 2px;
+  border-color: #333;
+}
+
+.accessibility-mode .achievement-card,
+.accessibility-mode .achievement-item.card {
+  border: 2px solid #333;
+}
+
+.accessibility-mode .achievement-info-item {
+  border-bottom-color: #333;
+  border-bottom-width: 2px;
+}
+
+.accessibility-mode .cookie-notice__inner {
+  border: 2px solid #fff;
+}
+
+.accessibility-mode .cabinet-list-card .achievement-actions .btn {
+  font-size: 1rem;
+}

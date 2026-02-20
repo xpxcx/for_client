@@ -1,1 +1,64 @@
+@media (max-width: 768px) {
+  .cabinet-list-card .achievements-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
 
+  .cabinet-list-card .achievement-item {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .cabinet-list-card .achievement-actions {
+    position: static;
+    order: 0;
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #e8ecf0;
+    background: #f8fafc;
+    border-radius: 12px 12px 0 0;
+  }
+
+  .cabinet-list-card .achievement-card-content {
+    flex-direction: column;
+    min-height: 0;
+    order: 1;
+  }
+
+  .cabinet-list-card .achievement-card-img-wrap,
+  .cabinet-list-card .achievement-card-placeholder {
+    width: 100%;
+    min-width: 0;
+    max-height: 200px;
+    min-height: 140px;
+    border-radius: 0;
+  }
+
+  .cabinet-list-card .achievement-card-content > .achievement-card-img-wrap:first-child,
+  .cabinet-list-card .achievement-card-content > .achievement-card-placeholder:first-child {
+    border-radius: 0;
+  }
+
+  .cabinet-list-card .achievement-card-img {
+    min-height: 140px;
+    max-height: 200px;
+    width: 100%;
+    object-fit: cover;
+  }
+
+  .cabinet-list-card .achievement-card-info {
+    padding: 1rem 1rem 1.25rem;
+  }
+
+  .cabinet-list-card .achievement-title {
+    font-size: 1.1rem;
+  }
+
+  .cabinet-list-card .achievement-desc {
+    font-size: 0.875rem;
+  }
+}

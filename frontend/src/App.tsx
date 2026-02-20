@@ -18,6 +18,7 @@ import CabinetLinksPage from './pages/cabinet/CabinetLinksPage/CabinetLinksPage'
 import CabinetContactInfoPage from './pages/cabinet/CabinetContactInfoPage/CabinetContactInfoPage'
 import './App.css'
 import './AboutSection.css'
+import './Accessibility.css'
 
 export default function App() {
   return (

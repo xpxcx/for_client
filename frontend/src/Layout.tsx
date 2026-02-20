@@ -28,10 +28,33 @@ const PAGE_TITLES: Record<string, string> = {
   '/links': 'Полезные ссылки — Портфолио педагога',
 }
 
+const STORAGE_KEY = 'accessibilityMode'
+
+function getStoredAccessibility(): boolean {
+  try {
+    return localStorage.getItem(STORAGE_KEY) === '1'
+  } catch {
+    return false
+  }
+}
+
 export default function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [sections, setSections] = useState<Section[]>(FALLBACK_SECTIONS)
+  const [accessibilityMode, setAccessibilityMode] = useState(() => getStoredAccessibility())
   const location = useLocation()
+
+  useEffect(() => {
+    try {
+      if (accessibilityMode) {
+        localStorage.setItem(STORAGE_KEY, '1')
+        document.documentElement.classList.add('accessibility-mode')
+      } else {
+        localStorage.removeItem(STORAGE_KEY)
+        document.documentElement.classList.remove('accessibility-mode')
+      }
+    } catch {}
+  }, [accessibilityMode])
 
   useEffect(() => {
     const title = PAGE_TITLES[location.pathname] ?? 'Портфолио педагога'
@@ -93,6 +116,17 @@ export default function Layout() {
             </li>
           ))}
         </ul>
+        <div className="sidebar-accessibility">
+          <button
+            type="button"
+            className={`sidebar-accessibility-btn ${accessibilityMode ? 'active' : ''}`}
+            onClick={() => setAccessibilityMode((v) => !v)}
+            aria-pressed={accessibilityMode}
+            aria-label={accessibilityMode ? 'Выключить версию для слабовидящих' : 'Включить версию для слабовидящих'}
+          >
+            Для слабовидящих
+          </button>
+        </div>
       </aside>
 
       <header className="header">
