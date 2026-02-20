@@ -125,6 +125,36 @@
   border-color: #3498db;
 }
 
+.password-field {
+  display: flex;
+  gap: 0.5rem;
+  align-items: stretch;
+}
+
+.password-field input {
+  flex: 1;
+  min-width: 0;
+}
+
+.password-toggle {
+  flex-shrink: 0;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #2c3e50;
+  background: #f0f4f8;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.password-toggle:hover {
+  background: #e2e8f0;
+  border-color: #3498db;
+}
+
 .contact-form input[type='file'] {
   padding: 0.5rem 0.75rem;
   border: 2px solid transparent;

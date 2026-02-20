@@ -19,8 +19,8 @@ const FALLBACK_SECTIONS: Section[] = [
 ]
 
 const PAGE_TITLES: Record<string, string> = {
-  '/': 'О себе — Портфолио педагога',
-  '/about': 'О себе — Портфолио педагога',
+  '/': 'Крумова Эльмира Мамедовна',
+  '/about': 'Крумова Эльмира Мамедовна',
   '/achievements': 'Достижения — Портфолио педагога',
   '/news': 'Новости — Портфолио педагога',
   '/contact': 'Контакты — Портфолио педагога',
@@ -53,7 +53,7 @@ export default function Layout() {
         localStorage.removeItem(STORAGE_KEY)
         document.documentElement.classList.remove('accessibility-mode')
       }
-    } catch {}
+    } catch { }
   }, [accessibilityMode])
 
   useEffect(() => {

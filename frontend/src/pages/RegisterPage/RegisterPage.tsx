@@ -6,6 +6,7 @@ import './RegisterPage.css'
 export default function RegisterPage() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
@@ -44,15 +45,28 @@ export default function RegisterPage() {
           </div>
           <div className="form-group">
             <label htmlFor="reg-password">Пароль</label>
-            <input
-              id="reg-password"
-              type="password"
-              autoComplete="new-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              minLength={6}
-            />
+            <div className="password-field">
+              <input
+                id="reg-password"
+                type={showPassword ? 'text' : 'password'}
+                autoComplete="new-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                minLength={6}
+              />
+              {password.length > 0 && (
+                <button
+                  type="button"
+                  className="password-toggle"
+                  onClick={() => setShowPassword((v) => !v)}
+                  aria-label={showPassword ? 'Скрыть пароль' : 'Показать пароль'}
+                  title={showPassword ? 'Скрыть пароль' : 'Показать пароль'}
+                >
+                  {showPassword ? 'Скрыть' : 'Показать'}
+                </button>
+              )}
+            </div>
           </div>
           {error && <p className="error">{error}</p>}
           <div className="form-actions">

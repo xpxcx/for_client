@@ -6,6 +6,7 @@ import './LoginPage.css'
 export default function LoginPage() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
@@ -44,14 +45,27 @@ export default function LoginPage() {
           </div>
           <div className="form-group">
             <label htmlFor="login-password">Пароль</label>
-            <input
-              id="login-password"
-              type="password"
-              autoComplete="current-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
+            <div className="password-field">
+              <input
+                id="login-password"
+                type={showPassword ? 'text' : 'password'}
+                autoComplete="current-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              {password.length > 0 && (
+                <button
+                  type="button"
+                  className="password-toggle"
+                  onClick={() => setShowPassword((v) => !v)}
+                  aria-label={showPassword ? 'Скрыть пароль' : 'Показать пароль'}
+                  title={showPassword ? 'Скрыть пароль' : 'Показать пароль'}
+                >
+                  {showPassword ? 'Скрыть' : 'Показать'}
+                </button>
+              )}
+            </div>
           </div>
           {error && <p className="error">{error}</p>}
           <div className="form-actions">
