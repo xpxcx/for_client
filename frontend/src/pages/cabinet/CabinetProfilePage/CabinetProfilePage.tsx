@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { getProfile, updateProfile, logout, getAllUsers, updateUserRole, isAdmin } from '../../../api/auth'
-import { fetchContent, updateContent, uploadProfilePhoto } from '../../../api/content'
+import { fetchContent, updateContent, uploadProfilePhoto, deleteProfilePhoto } from '../../../api/content'
 import './CabinetProfilePage.css'
 
 export interface EducationItem {
@@ -138,6 +138,13 @@ export default function CabinetProfilePage() {
       experience?: string
     }) => updateContent('about', data),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['content', 'about'] }),
+  })
+  const deletePhotoMutation = useMutation({
+    mutationFn: () => deleteProfilePhoto('about'),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['content', 'about'] })
+      setAboutImageUrl('')
+    },
   })
   const [aboutFullName, setAboutFullName] = useState('')
   const [aboutBirthDate, setAboutBirthDate] = useState('')
@@ -279,14 +286,29 @@ export default function CabinetProfilePage() {
                     <div className="profile-block-photo-placeholder">Фото</div>
                   )}
                 </div>
-                <button
-                  type="button"
-                  className="btn profile-upload-btn"
-                  onClick={() => photoInputRef.current?.click()}
-                  disabled={photoUploading}
-                >
-                  {photoUploading ? 'Загрузка...' : 'Загрузить фото'}
-                </button>
+                {aboutImageUrl ? (
+                  <button
+                    type="button"
+                    className="btn btn-small btn-danger"
+                    onClick={() => {
+                      if (confirm('Удалить фотографию?')) {
+                        deletePhotoMutation.mutate()
+                      }
+                    }}
+                    disabled={deletePhotoMutation.isPending}
+                  >
+                    {deletePhotoMutation.isPending ? 'Удаление...' : 'Удалить фото'}
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    className="btn profile-upload-btn"
+                    onClick={() => photoInputRef.current?.click()}
+                    disabled={photoUploading}
+                  >
+                    {photoUploading ? 'Загрузка...' : 'Загрузить фото'}
+                  </button>
+                )}
                 <input
                   id="about-photo-upload"
                   ref={photoInputRef}

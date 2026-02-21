@@ -1,12 +1,11 @@
 <!doctype html>
 <html lang="ru">
-<script>
-  try {
-    if (localStorage.getItem('accessibilityMode') === '1') document.documentElement.classList.add('accessibility-mode');
-  } catch (e) { }
-</script>
-
 <head>
+  <script>
+    try {
+      if (localStorage.getItem('accessibilityMode') === '1') document.documentElement.classList.add('accessibility-mode');
+    } catch (e) {}
+  </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Портфолио педагога</title>

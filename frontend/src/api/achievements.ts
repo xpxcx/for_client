@@ -83,3 +83,7 @@ export async function deleteAchievement(id: string): Promise<void> {
     throw new Error(data.message || `Ошибка удаления: ${res.status}`)
   }
 }
+
+export async function deleteAchievementPhoto(id: string): Promise<Achievement> {
+  return updateAchievement(id, { imageUrl: undefined })
+}

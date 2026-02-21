@@ -5,6 +5,7 @@ import {
   achievementsKeys,
   createAchievement,
   deleteAchievement,
+  deleteAchievementPhoto,
   fetchAchievements,
   updateAchievement,
   uploadImage,
@@ -57,6 +58,16 @@ export default function CabinetManagePage() {
     mutationFn: deleteAchievement,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: achievementsKeys.list() })
+    },
+  })
+
+  const deletePhotoMutation = useMutation({
+    mutationFn: deleteAchievementPhoto,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: achievementsKeys.list() })
+      if (editingId) {
+        setForm((f) => ({ ...f, imageUrl: '' }))
+      }
     },
   })
 
@@ -137,9 +148,10 @@ export default function CabinetManagePage() {
     uploadMutation.isPending ||
     updateMutation.isPending ||
     deleteMutation.isPending ||
+    deletePhotoMutation.isPending ||
     createMutation.isPending
   const mutationError =
-    uploadMutation.error || updateMutation.error || deleteMutation.error || createMutation.error
+    uploadMutation.error || updateMutation.error || deleteMutation.error || deletePhotoMutation.error || createMutation.error
 
   const handleDelete = (id: string) => {
     if (!confirm('Удалить это достижение?')) return
@@ -264,17 +276,36 @@ export default function CabinetManagePage() {
             </div>
             <div className="form-group">
               <label htmlFor="manage-image">Фотография</label>
-              {form.imageUrl && (
-                <p className="form-file-hint">Текущее фото: <img src={form.imageUrl} alt="" style={{ maxWidth: 120, maxHeight: 80, objectFit: 'cover', verticalAlign: 'middle' }} /></p>
+              {form.imageUrl ? (
+                <div>
+                  <p className="form-file-hint" style={{ marginBottom: '0.5rem' }}>
+                    Текущее фото: <img src={form.imageUrl} alt="" style={{ maxWidth: 120, maxHeight: 80, objectFit: 'cover', verticalAlign: 'middle' }} />
+                  </p>
+                  <button
+                    type="button"
+                    className="btn btn-small btn-danger"
+                    onClick={() => {
+                      if (confirm('Удалить фотографию?')) {
+                        deletePhotoMutation.mutate(editingId!)
+                      }
+                    }}
+                    disabled={deletePhotoMutation.isPending}
+                  >
+                    {deletePhotoMutation.isPending ? 'Удаление...' : 'Удалить фото'}
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <input
+                    id="manage-image"
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setReplaceFile(e.target.files?.[0] ?? null)}
+                  />
+                  {replaceFile && <p className="form-file-hint">Файл: {replaceFile.name}</p>}
+                </>
               )}
-              <input
-                id="manage-image"
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={(e) => setReplaceFile(e.target.files?.[0] ?? null)}
-              />
-              {replaceFile && <p className="form-file-hint">Новый файл: {replaceFile.name}</p>}
             </div>
             <div className="form-actions">
               <button type="submit" className="btn btn-primary" disabled={submitting}>

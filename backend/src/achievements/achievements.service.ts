@@ -1,8 +1,24 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { unlinkSync, existsSync } from 'fs';
+import { join } from 'path';
 import { NewsService } from '../news/news.service';
 import { Achievement as AchievementEntity } from './achievement.entity';
+
+const ACHIEVEMENTS_UPLOAD_DIR = 'achievements';
+
+function deleteAchievementImageByUrl(url: string | null | undefined): void {
+  if (!url || !url.startsWith('/uploads/')) return;
+  const relative = url.replace(/^\/uploads\//, '');
+  if (!relative.startsWith(ACHIEVEMENTS_UPLOAD_DIR + '/')) return;
+  const path = join(process.cwd(), 'uploads', relative);
+  try {
+    if (existsSync(path)) unlinkSync(path);
+  } catch {
+    // ignore
+  }
+}
 
 export interface Achievement {
   id: string;
@@ -76,6 +92,9 @@ export class AchievementsService {
     if (Number.isNaN(numId)) return null;
     const row = await this.repo.findOne({ where: { id: numId } });
     if (!row) return null;
+    if (dto.imageUrl !== undefined && row.imageUrl && (row.imageUrl !== dto.imageUrl || dto.imageUrl === null || dto.imageUrl === '')) {
+      deleteAchievementImageByUrl(row.imageUrl);
+    }
     if (dto.title !== undefined) row.title = dto.title;
     if (dto.description !== undefined) row.description = dto.description;
     if (dto.date !== undefined) row.date = dto.date;
@@ -87,6 +106,8 @@ export class AchievementsService {
   async remove(id: string): Promise<boolean> {
     const numId = Number(id);
     if (Number.isNaN(numId)) return false;
+    const row = await this.repo.findOne({ where: { id: numId } });
+    if (row?.imageUrl) deleteAchievementImageByUrl(row.imageUrl);
     const result = await this.repo.delete(numId);
     return (result.affected ?? 0) > 0;
   }

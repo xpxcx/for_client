@@ -57,6 +57,11 @@
   cursor: not-allowed;
 }
 
+.profile-block-photo-col > .btn {
+  margin-top: 0.75rem;
+  width: auto;
+}
+
 .profile-upload-btn {
   width: auto;
   margin-top: 0.75rem;

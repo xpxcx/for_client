@@ -183,32 +183,49 @@ export default function CabinetMaterialsPage() {
               />
             </div>
             <div className="form-group">
-              <label htmlFor="mat-add-url">Ссылка на файл или загруженный файл</label>
-              <input
-                id="mat-add-url"
-                value={form.fileUrl}
-                onChange={(e) => setForm((f) => ({ ...f, fileUrl: e.target.value }))}
-                placeholder="https://... или загрузите файл ниже"
-              />
-              <div className="form-group-file-upload">
-                <span className="form-group-file-or">или</span>
-                <button
-                  type="button"
-                  className="btn btn-secondary btn-small"
-                  onClick={() => addFileRef.current?.click()}
-                  disabled={uploading}
-                >
-                  {uploading ? 'Загрузка...' : 'Выбрать файл'}
-                </button>
-                <input
-                  ref={addFileRef}
-                  type="file"
-                  accept="*/*"
-                  onChange={handleFileAdd}
-                  style={{ display: 'none' }}
-                />
-              </div>
-              {uploadError && <p className="error form-file-error">{uploadError}</p>}
+              <label htmlFor="mat-add-url">Файл или ссылка</label>
+              {form.fileUrl ? (
+                <div>
+                  <p className="form-file-hint" style={{ marginBottom: '0.5rem' }}>
+                    <a href={form.fileUrl} target="_blank" rel="noreferrer">{form.fileUrl}</a>
+                  </p>
+                  <button
+                    type="button"
+                    className="btn btn-small btn-danger"
+                    onClick={() => setForm((f) => ({ ...f, fileUrl: '' }))}
+                  >
+                    Удалить файл/ссылку
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <input
+                    id="mat-add-url"
+                    value={form.fileUrl}
+                    onChange={(e) => setForm((f) => ({ ...f, fileUrl: e.target.value }))}
+                    placeholder="https://... или загрузите файл ниже"
+                  />
+                  <div className="form-group-file-upload">
+                    <span className="form-group-file-or">или</span>
+                    <button
+                      type="button"
+                      className="btn btn-secondary btn-small"
+                      onClick={() => addFileRef.current?.click()}
+                      disabled={uploading}
+                    >
+                      {uploading ? 'Загрузка...' : 'Выбрать файл'}
+                    </button>
+                    <input
+                      ref={addFileRef}
+                      type="file"
+                      accept="*/*"
+                      onChange={handleFileAdd}
+                      style={{ display: 'none' }}
+                    />
+                  </div>
+                  {uploadError && <p className="error form-file-error">{uploadError}</p>}
+                </>
+              )}
             </div>
             <div className="form-actions">
               <button type="submit" className="btn btn-primary" disabled={submitting}>
@@ -251,32 +268,49 @@ export default function CabinetMaterialsPage() {
               />
             </div>
             <div className="form-group">
-              <label htmlFor="mat-edit-url">Ссылка на файл или загруженный файл</label>
-              <input
-                id="mat-edit-url"
-                value={form.fileUrl}
-                onChange={(e) => setForm((f) => ({ ...f, fileUrl: e.target.value }))}
-                placeholder="https://... или загрузите файл ниже"
-              />
-              <div className="form-group-file-upload">
-                <span className="form-group-file-or">или</span>
-                <button
-                  type="button"
-                  className="btn btn-secondary btn-small"
-                  onClick={() => editFileRef.current?.click()}
-                  disabled={uploading}
-                >
-                  {uploading ? 'Загрузка...' : 'Выбрать файл'}
-                </button>
-                <input
-                  ref={editFileRef}
-                  type="file"
-                  accept="*/*"
-                  onChange={handleFileEdit}
-                  style={{ display: 'none' }}
-                />
-              </div>
-              {uploadError && <p className="error form-file-error">{uploadError}</p>}
+              <label htmlFor="mat-edit-url">Файл или ссылка</label>
+              {form.fileUrl ? (
+                <div>
+                  <p className="form-file-hint" style={{ marginBottom: '0.5rem' }}>
+                    <a href={form.fileUrl} target="_blank" rel="noreferrer">{form.fileUrl}</a>
+                  </p>
+                  <button
+                    type="button"
+                    className="btn btn-small btn-danger"
+                    onClick={() => setForm((f) => ({ ...f, fileUrl: '' }))}
+                  >
+                    Удалить файл/ссылку
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <input
+                    id="mat-edit-url"
+                    value={form.fileUrl}
+                    onChange={(e) => setForm((f) => ({ ...f, fileUrl: e.target.value }))}
+                    placeholder="https://... или загрузите файл ниже"
+                  />
+                  <div className="form-group-file-upload">
+                    <span className="form-group-file-or">или</span>
+                    <button
+                      type="button"
+                      className="btn btn-secondary btn-small"
+                      onClick={() => editFileRef.current?.click()}
+                      disabled={uploading}
+                    >
+                      {uploading ? 'Загрузка...' : 'Выбрать файл'}
+                    </button>
+                    <input
+                      ref={editFileRef}
+                      type="file"
+                      accept="*/*"
+                      onChange={handleFileEdit}
+                      style={{ display: 'none' }}
+                    />
+                  </div>
+                  {uploadError && <p className="error form-file-error">{uploadError}</p>}
+                </>
+              )}
             </div>
             <div className="form-actions">
               <button type="submit" className="btn btn-primary" disabled={submitting}>

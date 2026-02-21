@@ -50,3 +50,7 @@ export async function uploadProfilePhoto(file: File): Promise<{ url: string }> {
   }
   return res.json()
 }
+
+export async function deleteProfilePhoto(id: string): Promise<SectionContent> {
+  return updateContent(id, { imageUrl: '' })
+}

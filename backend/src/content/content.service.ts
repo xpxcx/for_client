@@ -1,5 +1,5 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
-import { readFileSync, writeFileSync, mkdirSync } from 'fs';
+import { readFileSync, writeFileSync, mkdirSync, unlinkSync, existsSync } from 'fs';
 import { join, dirname } from 'path';
 
 export interface Section {
@@ -20,6 +20,19 @@ export interface SectionContent {
 }
 
 const CONTENT_FILE = join(process.cwd(), 'data', 'content.json');
+const PROFILE_UPLOAD_DIR = 'profile';
+
+function deleteProfilePhotoByUrl(url: string | null | undefined): void {
+  if (!url || !url.startsWith('/uploads/')) return;
+  const relative = url.replace(/^\/uploads\//, '');
+  if (!relative.startsWith(PROFILE_UPLOAD_DIR + '/')) return;
+  const filePath = join(process.cwd(), 'uploads', relative);
+  try {
+    if (existsSync(filePath)) unlinkSync(filePath);
+  } catch {
+    // ignore
+  }
+}
 
 @Injectable()
 export class ContentService implements OnModuleInit {
@@ -112,11 +125,14 @@ export class ContentService implements OnModuleInit {
   ): SectionContent | null {
     const item = this.content[id];
     if (!item) return null;
+    if (dto.imageUrl !== undefined && item.imageUrl && (item.imageUrl !== dto.imageUrl || dto.imageUrl === '' || dto.imageUrl === null)) {
+      deleteProfilePhotoByUrl(item.imageUrl);
+    }
     if (dto.title !== undefined) item.title = dto.title;
     if (dto.body !== undefined) item.body = dto.body;
     if (dto.fullName !== undefined) item.fullName = dto.fullName;
     if (dto.birthDate !== undefined) item.birthDate = dto.birthDate;
-    if (dto.imageUrl !== undefined) item.imageUrl = dto.imageUrl;
+    if (dto.imageUrl !== undefined) item.imageUrl = dto.imageUrl ?? '';
     if (dto.education !== undefined) item.education = dto.education;
     if (dto.experience !== undefined) item.experience = dto.experience;
     this.saveToFile();

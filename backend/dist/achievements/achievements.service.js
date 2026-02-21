@@ -16,8 +16,25 @@ exports.AchievementsService = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
+const fs_1 = require("fs");
+const path_1 = require("path");
 const news_service_1 = require("../news/news.service");
 const achievement_entity_1 = require("./achievement.entity");
+const ACHIEVEMENTS_UPLOAD_DIR = 'achievements';
+function deleteAchievementImageByUrl(url) {
+    if (!url || !url.startsWith('/uploads/'))
+        return;
+    const relative = url.replace(/^\/uploads\//, '');
+    if (!relative.startsWith(ACHIEVEMENTS_UPLOAD_DIR + '/'))
+        return;
+    const path = (0, path_1.join)(process.cwd(), 'uploads', relative);
+    try {
+        if ((0, fs_1.existsSync)(path))
+            (0, fs_1.unlinkSync)(path);
+    }
+    catch {
+    }
+}
 function toResponse(row) {
     return {
         id: String(row.id),
@@ -75,6 +92,9 @@ let AchievementsService = class AchievementsService {
         const row = await this.repo.findOne({ where: { id: numId } });
         if (!row)
             return null;
+        if (dto.imageUrl !== undefined && row.imageUrl && (row.imageUrl !== dto.imageUrl || dto.imageUrl === null || dto.imageUrl === '')) {
+            deleteAchievementImageByUrl(row.imageUrl);
+        }
         if (dto.title !== undefined)
             row.title = dto.title;
         if (dto.description !== undefined)
@@ -90,6 +110,9 @@ let AchievementsService = class AchievementsService {
         const numId = Number(id);
         if (Number.isNaN(numId))
             return false;
+        const row = await this.repo.findOne({ where: { id: numId } });
+        if (row?.imageUrl)
+            deleteAchievementImageByUrl(row.imageUrl);
         const result = await this.repo.delete(numId);
         return (result.affected ?? 0) > 0;
     }

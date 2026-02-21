@@ -16,8 +16,25 @@ exports.MaterialsService = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
+const fs_1 = require("fs");
+const path_1 = require("path");
 const news_service_1 = require("../news/news.service");
 const material_entity_1 = require("./material.entity");
+const MATERIALS_UPLOAD_DIR = 'materials';
+function deleteMaterialFileByUrl(url) {
+    if (!url || !url.startsWith('/uploads/'))
+        return;
+    const relative = url.replace(/^\/uploads\//, '');
+    if (!relative.startsWith(MATERIALS_UPLOAD_DIR + '/'))
+        return;
+    const path = (0, path_1.join)(process.cwd(), 'uploads', relative);
+    try {
+        if ((0, fs_1.existsSync)(path))
+            (0, fs_1.unlinkSync)(path);
+    }
+    catch {
+    }
+}
 function toResponse(row) {
     return {
         id: String(row.id),
@@ -68,6 +85,9 @@ let MaterialsService = class MaterialsService {
         const row = await this.repo.findOne({ where: { id: numId } });
         if (!row)
             return null;
+        if (dto.fileUrl !== undefined && row.fileUrl && (row.fileUrl !== dto.fileUrl || dto.fileUrl === null || dto.fileUrl === '')) {
+            deleteMaterialFileByUrl(row.fileUrl);
+        }
         if (dto.title !== undefined)
             row.title = dto.title;
         if (dto.description !== undefined)
@@ -81,6 +101,9 @@ let MaterialsService = class MaterialsService {
         const numId = Number(id);
         if (Number.isNaN(numId))
             return false;
+        const row = await this.repo.findOne({ where: { id: numId } });
+        if (row?.fileUrl)
+            deleteMaterialFileByUrl(row.fileUrl);
         const result = await this.repo.delete(numId);
         return (result.affected ?? 0) > 0;
     }
