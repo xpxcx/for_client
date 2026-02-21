@@ -221,13 +221,12 @@ export default function CabinetManagePage() {
                 Отмена
               </button>
             </div>
-            {(uploadMutation.error || createMutation.error) && (
+            {(uploadMutation.error ?? createMutation.error) && (
               <p className="error">
-                {uploadMutation.error instanceof Error
-                  ? uploadMutation.error.message
-                  : createMutation.error instanceof Error
-                    ? createMutation.error.message
-                    : 'Произошла ошибка'}
+                {(() => {
+                  const err: unknown = uploadMutation.error ?? createMutation.error
+                  return err instanceof Error ? err.message : 'Произошла ошибка'
+                })()}
               </p>
             )}
             {createMutation.isSuccess && !createMutation.isPending && (

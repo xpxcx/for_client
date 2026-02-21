@@ -1,3 +1,4 @@
+import type { ReactElement } from 'react'
 import { useEffect, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useParams, useLocation, Link } from 'react-router-dom'
@@ -10,7 +11,7 @@ const API = '/api/content'
 
 const ABOUT_SECTION_HEADERS = /(Личные качества:|Профессиональные качества:|Компьютерные навыки:)/g
 
-function renderAboutBody(body: string): JSX.Element {
+function renderAboutBody(body: string): ReactElement {
   const raw = (body ?? '').trim()
   if (!raw) return <p className="about-body-text" />
 
@@ -66,7 +67,7 @@ function renderAboutBody(body: string): JSX.Element {
   )
 }
 
-function renderAboutListItem(item: string): JSX.Element {
+function renderAboutListItem(item: string): ReactElement {
   const idx = item.indexOf(': ')
   if (idx > 0 && idx < 80) {
     const label = item.slice(0, idx + 1)
