@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { useQueryClient } from '@tanstack/react-query'
 import { login, setToken } from '../api/auth'
 
 export default function LoginPage() {
@@ -8,6 +9,7 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -16,6 +18,7 @@ export default function LoginPage() {
     try {
       const { access_token } = await login(username, password)
       setToken(access_token)
+      queryClient.clear()
       navigate('/cabinet', { replace: true })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Ошибка входа')

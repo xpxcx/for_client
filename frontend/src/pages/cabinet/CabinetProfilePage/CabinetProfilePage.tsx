@@ -126,6 +126,7 @@ export default function CabinetProfilePage() {
   const { data: aboutContent } = useQuery({
     queryKey: ['content', 'about'],
     queryFn: () => fetchContent('about'),
+    enabled: admin,
   })
   const updateAboutMutation = useMutation({
     mutationFn: (data: {
@@ -195,6 +196,7 @@ export default function CabinetProfilePage() {
 
   const handleLogout = async () => {
     try {
+      queryClient.clear()
       await logout()
     } catch (err) {
       console.error('Ошибка выхода:', err)
@@ -257,6 +259,7 @@ export default function CabinetProfilePage() {
         )}
       </form>
 
+      {admin && (
       <div className="card cabinet-form-card" style={{ marginTop: '2rem' }}>
         <h2>Раздел о себе</h2>
         <p className="muted" style={{ marginBottom: '1rem', fontSize: '0.875rem', color: '#666' }}>
@@ -644,6 +647,7 @@ export default function CabinetProfilePage() {
           <p>Загрузка...</p>
         )}
       </div>
+      )}
 
       {admin && (
         <div style={{ marginTop: '2rem' }}>

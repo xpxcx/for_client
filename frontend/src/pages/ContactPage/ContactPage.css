@@ -87,6 +87,31 @@
   min-width: 0;
 }
 
+.contact-form-profile-row {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.contact-form-profile-row .contact-form-other-btn {
+  align-self: flex-start;
+  margin-top: -0.25rem;
+}
+
+.contact-form-other-btn {
+  background: none;
+  border: none;
+  color: #3498db;
+  font-size: 0.9375rem;
+  cursor: pointer;
+  padding: 0.25rem 0;
+  text-decoration: underline;
+}
+
+.contact-form-other-btn:hover:not(:disabled) {
+  color: #2980b9;
+}
+
 .contact-form label {
   font-size: 0.9375rem;
   font-weight: 500;

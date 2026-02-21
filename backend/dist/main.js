@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 require("dotenv/config");
 const fs_1 = require("fs");
 const core_1 = require("@nestjs/core");
+const express_1 = require("express");
 const cookieParser = require('cookie-parser');
 const path_1 = require("path");
 const app_module_1 = require("./app.module");
@@ -17,6 +18,8 @@ uploadsDirs.forEach((dir) => {
 });
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
+    app.use((0, express_1.json)({ limit: '12mb' }));
+    app.use((0, express_1.urlencoded)({ extended: true, limit: '12mb' }));
     app.use(cookieParser());
     const helmet = await import('helmet');
     app.use(helmet.default({ contentSecurityPolicy: false }));

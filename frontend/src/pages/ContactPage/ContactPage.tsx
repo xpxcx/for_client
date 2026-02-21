@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { fetchContactInfo, contactInfoKeys } from '../../api/contact-info'
 import { sendContactForm } from '../../api/contact'
+import { getProfile, getToken } from '../../api/auth'
 import PageNavButtons from '../../components/PageNavButtons'
 import './ContactPage.css'
 
@@ -9,6 +10,11 @@ export default function ContactPage() {
   const { data: contactInfo, isLoading, error } = useQuery({
     queryKey: contactInfoKeys.get(),
     queryFn: fetchContactInfo,
+  })
+  const { data: profile } = useQuery({
+    queryKey: ['profile'],
+    queryFn: getProfile,
+    enabled: !!getToken(),
   })
 
   const [formData, setFormData] = useState({
@@ -21,6 +27,8 @@ export default function ContactPage() {
   const [formError, setFormError] = useState<string | null>(null)
   const [categoryOpen, setCategoryOpen] = useState(false)
   const categoryDropdownRef = useRef<HTMLDivElement>(null)
+  const prefilledFromProfile = useRef(false)
+  const [showOtherButton, setShowOtherButton] = useState(true)
 
   const categoryOptions: { value: string; label: string }[] = [
     { value: 'student', label: 'Обучающийся' },
@@ -29,6 +37,17 @@ export default function ContactPage() {
     { value: 'other', label: 'Другое' },
   ]
   const currentCategoryLabel = categoryOptions.find((o) => o.value === formData.category)?.label ?? formData.category
+
+  useEffect(() => {
+    if (profile && !prefilledFromProfile.current) {
+      prefilledFromProfile.current = true
+      setFormData((prev) => ({
+        ...prev,
+        name: profile.fullName ?? '',
+        email: profile.email ?? '',
+      }))
+    }
+  }, [profile])
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -41,6 +60,12 @@ export default function ContactPage() {
       return () => document.removeEventListener('mousedown', handleClickOutside)
     }
   }, [categoryOpen])
+
+  const handleUseOther = () => {
+    prefilledFromProfile.current = true
+    setShowOtherButton(false)
+    setFormData((prev) => ({ ...prev, name: '', email: '' }))
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -115,27 +140,39 @@ export default function ContactPage() {
         <div className="card contact-form-card">
           <h2>Обратная связь</h2>
           <form className="contact-form" onSubmit={handleSubmit}>
-            <div className="form-group">
-              <label htmlFor="contact-form-name">ФИО *</label>
-              <input
-                id="contact-form-name"
-                type="text"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                required
-                disabled={formStatus === 'sending'}
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="contact-form-email">Email *</label>
-              <input
-                id="contact-form-email"
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                required
-                disabled={formStatus === 'sending'}
-              />
+            <div className="form-group contact-form-profile-row">
+              <div className="form-group">
+                <label htmlFor="contact-form-name">ФИО *</label>
+                <input
+                  id="contact-form-name"
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  required
+                  disabled={formStatus === 'sending'}
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="contact-form-email">Email *</label>
+                <input
+                  id="contact-form-email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  required
+                  disabled={formStatus === 'sending'}
+                />
+                {profile && showOtherButton && (
+                  <button
+                    type="button"
+                    className="contact-form-other-btn"
+                    onClick={handleUseOther}
+                    disabled={formStatus === 'sending'}
+                  >
+                    Другое?
+                  </button>
+                )}
+              </div>
             </div>
             <div className="form-group" ref={categoryDropdownRef}>
               <label id="contact-form-category-label">Категория</label>
