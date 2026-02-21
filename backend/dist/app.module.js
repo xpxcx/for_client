@@ -36,7 +36,7 @@ exports.AppModule = AppModule = __decorate([
                 password: process.env.DB_PASSWORD ?? 'postgres',
                 database: process.env.DB_NAME ?? 'portfolio',
                 autoLoadEntities: true,
-                synchronize: true,
+                synchronize: process.env.NODE_ENV !== 'production',
             }),
             auth_module_1.AuthModule,
             content_module_1.ContentModule,

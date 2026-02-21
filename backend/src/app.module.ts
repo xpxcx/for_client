@@ -24,7 +24,7 @@ import { SyncNewsModule } from './sync-news/sync-news.module';
       password: process.env.DB_PASSWORD ?? 'postgres',
       database: process.env.DB_NAME ?? 'portfolio',
       autoLoadEntities: true,
-      synchronize: true,
+      synchronize: process.env.NODE_ENV !== 'production',
     }),
     AuthModule,
     ContentModule,

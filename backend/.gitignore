@@ -1,4 +1,7 @@
 uploads/
+data/
 .env
+.env.local
 dist/
 node_modules/
+*.log
