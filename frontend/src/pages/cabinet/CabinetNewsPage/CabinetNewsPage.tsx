@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { NewsItem } from '../../../api/news'
-import { newsKeys, fetchNews, deleteNews, syncNews } from '../../../api/news'
+import { newsKeys, fetchNews, deleteNews } from '../../../api/news'
 import Pagination, { PAGE_SIZE } from '../../../components/Pagination'
 import './CabinetNewsPage.css'
 
@@ -28,12 +28,17 @@ function getNewsSourceLabel(sourceType: string | null | undefined): string {
 }
 
 export default function CabinetNewsPage() {
-  const [page, setPage] = useState(1)
   const queryClient = useQueryClient()
+  const [page, setPage] = useState(1)
   const { data: items = [], isLoading, error } = useQuery({
     queryKey: newsKeys.list(),
     queryFn: fetchNews,
   })
+
+  useEffect(() => {
+    if (items.length > 0 && (page - 1) * PAGE_SIZE >= items.length)
+      setPage(Math.max(1, Math.ceil(items.length / PAGE_SIZE)))
+  }, [items.length, page])
 
   const deleteMutation = useMutation({
     mutationFn: deleteNews,
@@ -42,12 +47,7 @@ export default function CabinetNewsPage() {
     },
   })
 
-  const syncMutation = useMutation({
-    mutationFn: syncNews,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: newsKeys.list() })
-    },
-  })
+
 
   const handleDelete = (id: string, title: string) => {
     if (!confirm(`Удалить новость «${title}»?`)) return
@@ -87,8 +87,9 @@ export default function CabinetNewsPage() {
         {items.length === 0 ? (
           <p className="cabinet-empty-message">Новостей пока нет.</p>
         ) : (
+          <>
           <ul className="cabinet-list">
-            {items.map((item: NewsItem) => (
+            {items.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE).map((item: NewsItem) => (
               <li key={item.id} className="cabinet-list-item">
                 <div>
                   <span className="cabinet-list-source">{getNewsSourceLabel(item.sourceType)}</span>
@@ -109,6 +110,8 @@ export default function CabinetNewsPage() {
               </li>
             ))}
           </ul>
+          <Pagination totalItems={items.length} currentPage={page} onPageChange={setPage} />
+          </>
         )}
       </div>
     </>

@@ -48,8 +48,8 @@ export class ContentService implements OnModuleInit {
   private readonly content: Record<string, SectionContent> = {
     home: {
       id: 'home',
-      title: 'Добро пожаловать',
-      body: 'Сайт-портфолио педагога. Используйте меню для навигации.',
+      title: 'Крумова Эльмира Мамедовна',
+      body: 'Крумова Эльмира Мамедовна',
     },
     about: {
       id: 'about',

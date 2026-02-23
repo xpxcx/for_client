@@ -437,6 +437,10 @@ html.dark-theme .cabinet-form-card .form-file-hint {
   color: #cbd5e1;
 }
 
+html.dark-theme .cabinet-form-card .muted {
+  color: #94a3b8 !important;
+}
+
 html.dark-theme .cabinet-list-item {
   border-color: #334155;
 }
@@ -541,6 +545,32 @@ html.dark-theme .about-edit-form .btn:hover:not(:disabled) {
   background: #2563eb;
   color: #fff;
   border-color: #2563eb;
+}
+
+html.dark-theme .profile-block-right .form-group,
+html.dark-theme .profile-block-right .education-items-group {
+  border-bottom-color: #334155;
+}
+
+html.dark-theme .experience-item-block {
+  background: #334155;
+  border-color: #475569;
+}
+
+html.dark-theme .experience-item-block .form-group label {
+  color: #cbd5e1;
+}
+
+html.dark-theme .experience-item-block input,
+html.dark-theme .experience-item-block textarea {
+  background: #1e293b;
+  border-color: #475569;
+  color: #e2e8f0;
+}
+
+html.dark-theme .experience-item-block input::placeholder,
+html.dark-theme .experience-item-block textarea::placeholder {
+  color: #94a3b8;
 }
 
 html.dark-theme .cookie-notice__inner {
