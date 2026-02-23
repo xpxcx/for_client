@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import PageNavButtons from '../../components/PageNavButtons'
+import Pagination, { PAGE_SIZE } from '../../components/Pagination'
 import './NewsPage.css'
 
 const API = '/api/news'
@@ -10,6 +12,9 @@ interface NewsItem {
   title: string
   text: string
   sourceType?: string | null
+  achievementId?: number | null
+  materialId?: number | null
+  linkId?: number | null
 }
 
 function getNewsSourceLabel(sourceType: string | null | undefined): string {
@@ -34,10 +39,24 @@ function formatDate(dateStr: string) {
   }
 }
 
+function parseLinkNewsText(text: string): { url: string; description: string } {
+  const parts = (text || '').split(/\r?\n/)
+  const last = parts[parts.length - 1]?.trim() ?? ''
+  const isUrl = /^https?:\/\//i.test(last)
+  if (parts.length >= 2 && isUrl) {
+    return { url: last, description: parts.slice(0, -1).join('\n').trim() }
+  }
+  if (parts.length === 1 && isUrl) {
+    return { url: last, description: '' }
+  }
+  return { url: '', description: text }
+}
+
 export default function NewsPage() {
   const [items, setItems] = useState<NewsItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [page, setPage] = useState(1)
 
   useEffect(() => {
     fetch(API)
@@ -62,14 +81,54 @@ export default function NewsPage() {
             <p>За последнюю неделю нет новостей</p>
           </div>
         ) : (
-          items.map((item) => (
-            <article key={item.id} className="news-item card">
-              <div className="news-source">{getNewsSourceLabel(item.sourceType)}</div>
-              <div className="news-date">{formatDate(item.date)}</div>
-              <h2 className="news-title">{item.title}</h2>
-              <p>{item.text}</p>
-            </article>
-          ))
+          <>
+            {items.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE).map((item) => {
+              const isLink = item.sourceType === 'link'
+              const { url, description } = isLink ? parseLinkNewsText(item.text) : { url: '', description: item.text }
+              const cardHref =
+                isLink && url
+                  ? url
+                  : item.sourceType === 'achievement' && item.achievementId != null
+                    ? `/achievements#achievement-${item.achievementId}`
+                    : item.sourceType === 'material' && item.materialId != null
+                      ? `/materials#material-${item.materialId}`
+                      : null
+              const content = (
+                <>
+                  <div className="news-source">{getNewsSourceLabel(item.sourceType)}</div>
+                  <div className="news-date">{formatDate(item.date)}</div>
+                  <h2 className="news-title">{item.title}</h2>
+                  {description ? <p>{description}</p> : null}
+                </>
+              )
+              if (cardHref) {
+                if (isLink && url) {
+                  return (
+                    <a
+                      key={item.id}
+                      href={cardHref}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="news-item card news-item-link"
+                    >
+                      {content}
+                    </a>
+                  )
+                }
+                return (
+                  <Link key={item.id} to={cardHref} className="news-item card news-item-link">
+                    {content}
+                  </Link>
+                )
+              }
+              return (
+                <article key={item.id} className="news-item card">
+                  {content}
+                </article>
+              )
+            })}
+            <Pagination totalItems={items.length} currentPage={page} onPageChange={setPage} />
+          </>
         )}
       </div>
       <PageNavButtons />

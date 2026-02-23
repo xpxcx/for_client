@@ -24,6 +24,27 @@ export class AuthController {
     return { access_token: tokens.access_token };
   }
 
+  @Post('register/send-code')
+  async sendRegisterCode(@Body() body: { email: string }) {
+    await this.authService.sendRegisterCode(body.email);
+    return { success: true };
+  }
+
+  @Post('register/verify')
+  async registerVerify(
+    @Body() body: { email: string; code: string; password: string },
+    @Res({ passthrough: true }) res: express.Response,
+  ): Promise<{ access_token: string }> {
+    const tokens = await this.authService.verifyAndRegister(body.email, body.code, body.password);
+    res.cookie('refresh_token', tokens.refresh_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+    return { access_token: tokens.access_token };
+  }
+
   @Post('register')
   async register(
     @Body() body: { username: string; password: string },
@@ -37,6 +58,18 @@ export class AuthController {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
     return { access_token: tokens.access_token };
+  }
+
+  @Post('forgot-password')
+  async forgotPassword(@Body() body: { email: string }) {
+    await this.authService.sendResetCode(body.email);
+    return { success: true };
+  }
+
+  @Post('reset-password')
+  async resetPassword(@Body() body: { email: string; code: string; newPassword: string }) {
+    await this.authService.resetPassword(body.email, body.code, body.newPassword);
+    return { success: true };
   }
 
   @Post('refresh')
@@ -73,6 +106,25 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   getProfile(@Request() req: { user: User }) {
     return this.authService.getProfile(req.user.id);
+  }
+
+  @Post('profile/send-code')
+  @UseGuards(JwtAuthGuard)
+  sendProfileCode(@Request() req: { user: User }, @Body() body: { email: string }) {
+    return this.authService.sendProfileCode(req.user.id, body.email);
+  }
+
+  @Patch('profile/verify')
+  @UseGuards(JwtAuthGuard)
+  verifyProfileUpdate(
+    @Request() req: { user: User },
+    @Body() body: { code: string; fullName?: string | null; email?: string | null; newPassword?: string },
+  ) {
+    return this.authService.verifyProfileUpdate(req.user.id, body.code, {
+      fullName: body.fullName,
+      email: body.email,
+      newPassword: body.newPassword,
+    });
   }
 
   @Patch('profile')

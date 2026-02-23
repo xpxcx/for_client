@@ -51,6 +51,48 @@ export async function login(username: string, password: string): Promise<{ acces
   return data
 }
 
+const SEND_CODE_ERROR_MESSAGE =
+  'Не удалось отправить код, возможно, у Вас включен VPN. Отключите VPN и повторите попытку.'
+
+export async function sendRegisterCode(email: string): Promise<void> {
+  try {
+    const res = await fetch('/api/auth/register/send-code', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ email }),
+    })
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}))
+      if (res.status === 401 && data.message) throw new Error(data.message)
+      throw new Error(SEND_CODE_ERROR_MESSAGE)
+    }
+  } catch (err) {
+    if (err instanceof Error && err.message !== SEND_CODE_ERROR_MESSAGE && err.message.includes('привязан')) throw err
+    throw new Error(SEND_CODE_ERROR_MESSAGE)
+  }
+}
+
+export async function registerVerify(
+  email: string,
+  code: string,
+  password: string,
+): Promise<{ access_token: string }> {
+  const res = await fetch('/api/auth/register/verify', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({ email, code, password }),
+  })
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}))
+    throw new Error(data.message ?? 'Ошибка регистрации')
+  }
+  const data = await res.json()
+  setToken(data.access_token)
+  return data
+}
+
 export async function register(username: string, password: string): Promise<{ access_token: string }> {
   const res = await fetch('/api/auth/register', {
     method: 'POST',
@@ -65,6 +107,34 @@ export async function register(username: string, password: string): Promise<{ ac
   const data = await res.json()
   setToken(data.access_token)
   return data
+}
+
+export async function forgotPassword(email: string): Promise<void> {
+  try {
+    const res = await fetch('/api/auth/forgot-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ email }),
+    })
+    if (!res.ok) throw new Error(SEND_CODE_ERROR_MESSAGE)
+  } catch (err) {
+    if (err instanceof Error && err.message === SEND_CODE_ERROR_MESSAGE) throw err
+    throw new Error(SEND_CODE_ERROR_MESSAGE)
+  }
+}
+
+export async function resetPassword(email: string, code: string, newPassword: string): Promise<void> {
+  const res = await fetch('/api/auth/reset-password', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({ email, code, newPassword }),
+  })
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}))
+    throw new Error(data.message ?? 'Ошибка сброса пароля')
+  }
 }
 
 export async function refreshToken(): Promise<string> {
@@ -133,6 +203,39 @@ export async function updateProfile(data: {
     body: JSON.stringify(data),
   })
   if (!res.ok) throw new Error('Ошибка сохранения')
+  return res.json()
+}
+
+export async function sendProfileCode(email: string): Promise<void> {
+  try {
+    const res = await fetchWithRefresh('/api/auth/profile/send-code', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    })
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}))
+      throw new Error(data.message ?? SEND_CODE_ERROR_MESSAGE)
+    }
+  } catch (err) {
+    if (err instanceof Error && err.message !== SEND_CODE_ERROR_MESSAGE && err.message.includes('привязан')) throw err
+    throw new Error(SEND_CODE_ERROR_MESSAGE)
+  }
+}
+
+export async function verifyProfileUpdate(
+  code: string,
+  data: { fullName?: string | null; email?: string | null; newPassword?: string },
+): Promise<Profile> {
+  const res = await fetchWithRefresh('/api/auth/profile/verify', {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code, ...data }),
+  })
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}))
+    throw new Error(data.message ?? 'Ошибка сохранения')
+  }
   return res.json()
 }
 

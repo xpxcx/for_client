@@ -17,7 +17,7 @@ function formatDate(dateStr: string) {
 
 function AchievementCard({ item, onImageClick }: { item: Achievement; onImageClick?: (url: string) => void }) {
   return (
-    <article className="card achievement-card">
+    <article id={`achievement-${item.id}`} className="card achievement-card">
       <div className="achievement-info-item">
         <span className="achievement-info-label">Дата</span>
         <span className="achievement-info-value">{formatDate(item.date)}</span>
@@ -78,6 +78,32 @@ export default function AchievementsPage() {
     queryKey: achievementsKeys.list(),
     queryFn: fetchAchievements,
   })
+
+  useEffect(() => {
+    const m = window.location.hash.match(/^#achievement-(\d+)$/)
+    if (!m || !items.length) return
+    const id = m[1]
+    const index = items.findIndex((i) => String(i.id) === id)
+    if (index < 0) return
+    const targetPage = Math.floor(index / PAGE_SIZE) + 1
+    setPage((p) => (p === targetPage ? p : targetPage))
+  }, [items])
+
+  useEffect(() => {
+    const m = window.location.hash.match(/^#achievement-(\d+)$/)
+    if (!m) return
+    const id = m[1]
+    const t = setTimeout(() => {
+      const el = document.getElementById(`achievement-${id}`)
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        el.classList.add('news-target-highlight')
+        const t2 = setTimeout(() => el.classList.remove('news-target-highlight'), 2600)
+        return () => clearTimeout(t2)
+      }
+    }, 100)
+    return () => clearTimeout(t)
+  }, [page, items])
 
   if (isLoading) {
     return (

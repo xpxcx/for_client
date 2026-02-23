@@ -1,6 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useState } from 'react'
 import type { NewsItem } from '../../../api/news'
 import { newsKeys, fetchNews, deleteNews, syncNews } from '../../../api/news'
+import Pagination, { PAGE_SIZE } from '../../../components/Pagination'
 import './CabinetNewsPage.css'
 
 function formatDate(dateStr: string) {
@@ -26,6 +28,7 @@ function getNewsSourceLabel(sourceType: string | null | undefined): string {
 }
 
 export default function CabinetNewsPage() {
+  const [page, setPage] = useState(1)
   const queryClient = useQueryClient()
   const { data: items = [], isLoading, error } = useQuery({
     queryKey: newsKeys.list(),
@@ -77,27 +80,8 @@ export default function CabinetNewsPage() {
     <>
       <h2>Управление новостями</h2>
       <p className="cabinet-hint">
-        Новости создаются автоматически при добавлении достижений, материалов и ссылок. Для уже добавленных ранее материалов и ссылок нажмите «Синхронизировать новости».
+        Новости создаются автоматически при добавлении достижений, материалов и ссылок. Отображаются достижения, материалы и ссылки, добавленные в течении недели.
       </p>
-      <button
-        type="button"
-        className="btn btn-primary"
-        onClick={() => syncMutation.mutate()}
-        disabled={syncMutation.isPending}
-        style={{ marginBottom: '1rem' }}
-      >
-        {syncMutation.isPending ? 'Синхронизация...' : 'Синхронизировать новости'}
-      </button>
-      {syncMutation.isSuccess && syncMutation.data && (
-        <p className="success" style={{ marginBottom: '1rem' }}>
-          Создано новостей: {syncMutation.data.created}.
-        </p>
-      )}
-      {syncMutation.error && (
-        <p className="error" style={{ marginBottom: '1rem' }}>
-          {syncMutation.error instanceof Error ? syncMutation.error.message : 'Ошибка синхронизации'}
-        </p>
-      )}
       <div className="card">
         <h3>Список новостей</h3>
         {items.length === 0 ? (

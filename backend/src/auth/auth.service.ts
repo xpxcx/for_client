@@ -3,13 +3,20 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcryptjs';
 import { Repository } from 'typeorm';
-import { randomBytes } from 'crypto';
+import { randomBytes, randomInt } from 'crypto';
 import { User } from './user.entity';
 import { RefreshToken } from './refresh-token.entity';
+import { EmailVerification } from './email-verification.entity';
+import { MailService } from '../mail/mail.service';
 
 const SALT_ROUNDS = 12;
 const ACCESS_TOKEN_EXPIRES_IN = '15m';
 const REFRESH_TOKEN_EXPIRES_DAYS = 7;
+const CODE_EXPIRY_MINUTES = 15;
+
+function generateCode(): string {
+  return randomInt(100000, 999999).toString();
+}
 
 @Injectable()
 export class AuthService {
@@ -18,8 +25,11 @@ export class AuthService {
     private readonly userRepo: Repository<User>,
     @InjectRepository(RefreshToken)
     private readonly refreshTokenRepo: Repository<RefreshToken>,
+    @InjectRepository(EmailVerification)
+    private readonly emailVerificationRepo: Repository<EmailVerification>,
     private readonly jwtService: JwtService,
-  ) {}
+    private readonly mailService: MailService,
+  ) { }
 
   async validateUser(username: string, password: string): Promise<User | null> {
     const user = await this.userRepo.findOne({ where: { username } });
@@ -28,18 +38,77 @@ export class AuthService {
     return ok ? user : null;
   }
 
-  async register(username: string, password: string): Promise<{ access_token: string; refresh_token: string }> {
+  async register(username: string, password: string, email?: string | null): Promise<{ access_token: string; refresh_token: string }> {
     const existing = await this.userRepo.findOne({ where: { username } });
     if (existing) throw new UnauthorizedException('Пользователь уже существует');
+    if (email) {
+      const existingEmail = await this.userRepo.findOne({ where: { email } });
+      if (existingEmail) throw new UnauthorizedException('Этот email уже привязан к аккаунту');
+    }
     const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
-    const user = this.userRepo.create({ username, passwordHash, role: 'user' });
+    const user = this.userRepo.create({ username, passwordHash, role: 'user', email: email ?? null });
     await this.userRepo.save(user);
     return this.generateTokens(user);
   }
 
+  async sendRegisterCode(email: string): Promise<void> {
+    const normalized = email.trim().toLowerCase();
+    const existing = await this.userRepo.findOne({ where: { email: normalized } });
+    if (existing) throw new UnauthorizedException('Этот email уже привязан к аккаунту');
+    await this.emailVerificationRepo.delete({ email: normalized, type: 'register' });
+    const code = generateCode();
+    const expiresAt = new Date();
+    expiresAt.setMinutes(expiresAt.getMinutes() + CODE_EXPIRY_MINUTES);
+    await this.emailVerificationRepo.save({ email: normalized, code, expiresAt, type: 'register' });
+    await this.mailService.sendVerificationCode(normalized, code, 'register');
+  }
+
+  async verifyAndRegister(email: string, code: string, password: string): Promise<{ access_token: string; refresh_token: string }> {
+    const normalized = email.trim().toLowerCase();
+    const record = await this.emailVerificationRepo.findOne({
+      where: { email: normalized, type: 'register', code },
+    });
+    if (!record) throw new UnauthorizedException('Неверный или истёкший код');
+    if (record.expiresAt < new Date()) {
+      await this.emailVerificationRepo.remove(record);
+      throw new UnauthorizedException('Код истёк. Запросите новый.');
+    }
+    await this.emailVerificationRepo.remove(record);
+    return this.register(normalized, password, normalized);
+  }
+
+  async sendResetCode(email: string): Promise<void> {
+    const normalized = email.trim().toLowerCase();
+    const user = await this.userRepo.findOne({ where: { email: normalized } });
+    if (!user) return;
+    await this.emailVerificationRepo.delete({ email: normalized, type: 'reset' });
+    const code = generateCode();
+    const expiresAt = new Date();
+    expiresAt.setMinutes(expiresAt.getMinutes() + CODE_EXPIRY_MINUTES);
+    await this.emailVerificationRepo.save({ email: normalized, code, expiresAt, type: 'reset' });
+    await this.mailService.sendVerificationCode(normalized, code, 'reset');
+  }
+
+  async resetPassword(email: string, code: string, newPassword: string): Promise<void> {
+    const normalized = email.trim().toLowerCase();
+    const record = await this.emailVerificationRepo.findOne({
+      where: { email: normalized, type: 'reset', code },
+    });
+    if (!record) throw new UnauthorizedException('Неверный или истёкший код');
+    if (record.expiresAt < new Date()) {
+      await this.emailVerificationRepo.remove(record);
+      throw new UnauthorizedException('Код истёк. Запросите новый.');
+    }
+    const user = await this.userRepo.findOne({ where: { email: normalized } });
+    if (!user) throw new UnauthorizedException('Неверно указана почта');
+    user.passwordHash = await bcrypt.hash(newPassword, SALT_ROUNDS);
+    await this.userRepo.save(user);
+    await this.emailVerificationRepo.remove(record);
+  }
+
   async login(username: string, password: string): Promise<{ access_token: string; refresh_token: string }> {
     const user = await this.validateUser(username, password);
-    if (!user) throw new UnauthorizedException('Неверный логин или пароль');
+    if (!user) throw new UnauthorizedException('Неверная почта или пароль');
     return this.generateTokens(user);
   }
 
@@ -105,6 +174,64 @@ export class AuthService {
     return this.getProfile(userId);
   }
 
+  async sendProfileCode(userId: number, email: string): Promise<void> {
+    const normalized = email.trim().toLowerCase();
+    if (!normalized) throw new UnauthorizedException('Укажите email');
+    const user = await this.userRepo.findOne({ where: { id: userId } });
+    if (!user) throw new UnauthorizedException();
+    const isNewEmail = normalized !== (user.email?.trim().toLowerCase() ?? '');
+    if (isNewEmail) {
+      const existing = await this.userRepo.findOne({ where: { email: normalized } });
+      if (existing) throw new UnauthorizedException('Этот email уже привязан к другому аккаунту');
+    }
+    await this.emailVerificationRepo.delete({ userId, type: 'profile' });
+    const code = generateCode();
+    const expiresAt = new Date();
+    expiresAt.setMinutes(expiresAt.getMinutes() + CODE_EXPIRY_MINUTES);
+    await this.emailVerificationRepo.save({
+      email: normalized,
+      code,
+      expiresAt,
+      type: 'profile',
+      userId,
+    });
+    await this.mailService.sendVerificationCode(normalized, code, 'profile');
+  }
+
+  async verifyProfileUpdate(
+    userId: number,
+    code: string,
+    dto: { fullName?: string | null; email?: string | null; newPassword?: string },
+  ): Promise<{ username: string; fullName: string | null; email: string | null }> {
+    const record = await this.emailVerificationRepo.findOne({
+      where: { userId, type: 'profile', code },
+    });
+    if (!record) throw new UnauthorizedException('Неверный или истёкший код');
+    if (record.expiresAt < new Date()) {
+      await this.emailVerificationRepo.remove(record);
+      throw new UnauthorizedException('Код истёк. Запросите новый.');
+    }
+    const user = await this.userRepo.findOne({ where: { id: userId } });
+    if (!user) throw new UnauthorizedException();
+    if (dto.fullName !== undefined) user.fullName = dto.fullName ?? null;
+    const newEmail = (record.email || '').trim().toLowerCase() || null;
+    user.email = newEmail;
+    if (newEmail) {
+      const existingByUsername = await this.userRepo.findOne({ where: { username: newEmail } });
+      if (existingByUsername && existingByUsername.id !== userId) {
+        await this.emailVerificationRepo.remove(record);
+        throw new UnauthorizedException('Этот email уже используется для входа другим пользователем');
+      }
+      user.username = newEmail;
+    }
+    if (dto.newPassword !== undefined && dto.newPassword.length > 0) {
+      user.passwordHash = await bcrypt.hash(dto.newPassword, SALT_ROUNDS);
+    }
+    await this.userRepo.save(user);
+    await this.emailVerificationRepo.remove(record);
+    return this.getProfile(userId);
+  }
+
   async getAllUsers(): Promise<Array<{ id: number; fullName: string | null; role: string }>> {
     const users = await this.userRepo.find({
       select: ['id', 'fullName', 'role'],
@@ -115,7 +242,7 @@ export class AuthService {
 
   async updateUserRole(userId: number, role: 'user' | 'admin'): Promise<{ id: number; fullName: string | null; role: string }> {
     const user = await this.userRepo.findOne({ where: { id: userId } });
-    if (!user) throw new UnauthorizedException('Пользователь не найден');
+    if (!user) throw new UnauthorizedException('Неверно указана почта');
     user.role = role;
     await this.userRepo.save(user);
     return { id: user.id, fullName: user.fullName ?? null, role: user.role };

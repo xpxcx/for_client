@@ -9,6 +9,7 @@ import {
   deleteMaterial,
   uploadMaterialFile,
 } from '../../../api/materials'
+import Pagination, { PAGE_SIZE } from '../../../components/Pagination'
 import './CabinetMaterialsPage.css'
 
 const emptyForm = { title: '', description: '', fileUrl: '' }
@@ -19,6 +20,7 @@ export default function CabinetMaterialsPage() {
   const [showAdd, setShowAdd] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [uploadError, setUploadError] = useState<string | null>(null)
+  const [page, setPage] = useState(1)
   const addFileRef = useRef<HTMLInputElement>(null)
   const editFileRef = useRef<HTMLInputElement>(null)
   const queryClient = useQueryClient()
@@ -328,8 +330,9 @@ export default function CabinetMaterialsPage() {
         {items.length === 0 ? (
           <p className="cabinet-empty-message">Материалов пока нет.</p>
         ) : (
+          <>
           <ul className="cabinet-list">
-            {items.map((item) => (
+            {items.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE).map((item) => (
               <li key={item.id} className="cabinet-list-item">
                 <div>
                   <strong>{item.title}</strong>
@@ -361,6 +364,8 @@ export default function CabinetMaterialsPage() {
               </li>
             ))}
           </ul>
+          <Pagination totalItems={items.length} currentPage={page} onPageChange={setPage} />
+          </>
         )}
       </div>
     </>

@@ -6,6 +6,9 @@ export interface NewsItem {
     title: string;
     text: string;
     sourceType: string | null;
+    achievementId: number | null;
+    materialId: number | null;
+    linkId: number | null;
 }
 export declare class NewsService {
     private readonly repo;

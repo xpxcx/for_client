@@ -16,6 +16,23 @@
   border-left: 4px solid #3498db;
 }
 
+.news-item-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  cursor: pointer;
+  transition: box-shadow 0.25s ease;
+}
+
+.news-item-link:hover {
+  box-shadow: 0 0 0 2px #3498db;
+}
+
+.news-item-link:hover,
+.news-item-link:hover * {
+  text-decoration: none;
+}
+
 .news-source {
   font-size: 0.875rem;
   color: #3498db;
@@ -33,4 +50,17 @@
   font-size: 1.25rem;
   margin: 0 0 0.5rem 0;
   color: #2c3e50;
+}
+
+.news-title a {
+  color: #3498db;
+  text-decoration: none;
+}
+
+.news-title a:hover {
+  text-decoration: underline;
+}
+
+.news-item p {
+  white-space: pre-line;
 }

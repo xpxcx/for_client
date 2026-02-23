@@ -20,6 +20,11 @@ export default function Pagination({
   const totalPages = Math.max(1, Math.ceil(totalItems / pageSize))
   if (totalPages <= 1) return null
 
+  const goToPage = (page: number) => {
+    onPageChange(page)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
   const pages: number[] = []
   let from = Math.max(1, currentPage - 2)
   let to = Math.min(totalPages, currentPage + 2)
@@ -35,7 +40,7 @@ export default function Pagination({
         type="button"
         className="pagination-btn"
         disabled={currentPage <= 1}
-        onClick={() => onPageChange(currentPage - 1)}
+        onClick={() => goToPage(currentPage - 1)}
         aria-label="Предыдущая страница"
       >
         ← Предыдущая
@@ -44,7 +49,7 @@ export default function Pagination({
         {from > 1 && (
           <>
             <li>
-              <button type="button" className="pagination-num" onClick={() => onPageChange(1)}>1</button>
+              <button type="button" className="pagination-num" onClick={() => goToPage(1)}>1</button>
             </li>
             {from > 2 && <li className="pagination-ellipsis">…</li>}
           </>
@@ -54,7 +59,7 @@ export default function Pagination({
             <button
               type="button"
               className={`pagination-num ${p === currentPage ? 'pagination-num-active' : ''}`}
-              onClick={() => onPageChange(p)}
+              onClick={() => goToPage(p)}
               aria-current={p === currentPage ? 'page' : undefined}
             >
               {p}
@@ -65,7 +70,7 @@ export default function Pagination({
           <>
             {to < totalPages - 1 && <li className="pagination-ellipsis">…</li>}
             <li>
-              <button type="button" className="pagination-num" onClick={() => onPageChange(totalPages)}>
+              <button type="button" className="pagination-num" onClick={() => goToPage(totalPages)}>
                 {totalPages}
               </button>
             </li>
@@ -76,7 +81,7 @@ export default function Pagination({
         type="button"
         className="pagination-btn"
         disabled={currentPage >= totalPages}
-        onClick={() => onPageChange(currentPage + 1)}
+        onClick={() => goToPage(currentPage + 1)}
         aria-label="Следующая страница"
       >
         Следующая →

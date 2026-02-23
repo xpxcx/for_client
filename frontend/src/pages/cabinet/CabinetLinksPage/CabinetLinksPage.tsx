@@ -8,6 +8,7 @@ import {
   updateLink,
   deleteLink,
 } from '../../../api/links'
+import Pagination, { PAGE_SIZE } from '../../../components/Pagination'
 import './CabinetLinksPage.css'
 
 const emptyForm = { title: '', url: '', description: '' }
@@ -16,6 +17,7 @@ export default function CabinetLinksPage() {
   const [form, setForm] = useState(emptyForm)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [showAdd, setShowAdd] = useState(false)
+  const [page, setPage] = useState(1)
   const queryClient = useQueryClient()
 
   const { data: items = [], isLoading, error } = useQuery({
@@ -220,8 +222,9 @@ export default function CabinetLinksPage() {
         {items.length === 0 ? (
           <p className="cabinet-empty-message">Ссылок пока нет.</p>
         ) : (
+          <>
           <ul className="cabinet-list">
-            {items.map((item) => (
+            {items.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE).map((item) => (
               <li key={item.id} className="cabinet-list-item">
                 <div>
                   <a href={item.url} target="_blank" rel="noreferrer" className="link">
@@ -252,6 +255,8 @@ export default function CabinetLinksPage() {
               </li>
             ))}
           </ul>
+          <Pagination totalItems={items.length} currentPage={page} onPageChange={setPage} />
+          </>
         )}
       </div>
     </>

@@ -9,6 +9,8 @@ import AchievementsPage from './pages/AchievementsPage/AchievementsPage'
 import MaterialsPage from './pages/MaterialsPage/MaterialsPage'
 import LoginPage from './pages/LoginPage/LoginPage'
 import RegisterPage from './pages/RegisterPage/RegisterPage'
+import ForgotPasswordPage from './pages/ForgotPasswordPage/ForgotPasswordPage'
+import ResetPasswordPage from './pages/ResetPasswordPage/ResetPasswordPage'
 import CabinetLayout from './pages/cabinet/CabinetLayout/CabinetLayout'
 import CabinetProfilePage from './pages/cabinet/CabinetProfilePage/CabinetProfilePage'
 import CabinetManagePage from './pages/cabinet/CabinetManagePage/CabinetManagePage'
@@ -32,6 +34,8 @@ export default function App() {
           <Route path="materials" element={<MaterialsPage />} />
           <Route path="login" element={<LoginPage />} />
           <Route path="register" element={<RegisterPage />} />
+          <Route path="forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="reset-password" element={<ResetPasswordPage />} />
           <Route
             path="cabinet"
             element={

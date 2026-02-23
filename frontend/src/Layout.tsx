@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link, Outlet, useLocation } from 'react-router-dom'
 import CookieNotice from './components/CookieNotice'
 import './Layout.css'
+import './DarkTheme.css'
 
 interface Section {
   id: string
@@ -18,17 +19,31 @@ const FALLBACK_SECTIONS: Section[] = [
   { id: 'links', title: 'Полезные ссылки', path: '/links' },
 ]
 
+const TITLE_PREFIX = 'Крумова Эльмира Мамедовна - '
+
 const PAGE_TITLES: Record<string, string> = {
-  '/': 'Крумова Эльмира Мамедовна',
-  '/about': 'Крумова Эльмира Мамедовна',
-  '/achievements': 'Достижения — Портфолио педагога',
-  '/news': 'Новости — Портфолио педагога',
-  '/contact': 'Контакты — Портфолио педагога',
-  '/materials': 'Материалы — Портфолио педагога',
-  '/links': 'Полезные ссылки — Портфолио педагога',
+  '/': `${TITLE_PREFIX}О себе`,
+  '/about': `${TITLE_PREFIX}О себе`,
+  '/achievements': `${TITLE_PREFIX}Достижения`,
+  '/news': `${TITLE_PREFIX}Новости`,
+  '/contact': `${TITLE_PREFIX}Контакты`,
+  '/materials': `${TITLE_PREFIX}Материалы`,
+  '/links': `${TITLE_PREFIX}Полезные ссылки`,
+  '/login': `${TITLE_PREFIX}Вход`,
+  '/register': `${TITLE_PREFIX}Регистрация`,
+  '/forgot-password': `${TITLE_PREFIX}Восстановление пароля`,
+  '/reset-password': `${TITLE_PREFIX}Сброс пароля`,
+  '/cabinet': `${TITLE_PREFIX}Личный кабинет`,
+  '/cabinet/profile': `${TITLE_PREFIX}Профиль`,
+  '/cabinet/manage': `${TITLE_PREFIX}Управление достижениями`,
+  '/cabinet/materials': `${TITLE_PREFIX}Управление материалами`,
+  '/cabinet/news': `${TITLE_PREFIX}Управление новостями`,
+  '/cabinet/links': `${TITLE_PREFIX}Управление полезными ссылками`,
+  '/cabinet/contact-info': `${TITLE_PREFIX}Контактная информация`,
 }
 
 const STORAGE_KEY = 'accessibilityMode'
+const DARK_THEME_KEY = 'darkTheme'
 
 function getStoredAccessibility(): boolean {
   try {
@@ -38,10 +53,19 @@ function getStoredAccessibility(): boolean {
   }
 }
 
+function getStoredDarkTheme(): boolean {
+  try {
+    return localStorage.getItem(DARK_THEME_KEY) === '1'
+  } catch {
+    return false
+  }
+}
+
 export default function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [sections, setSections] = useState<Section[]>(FALLBACK_SECTIONS)
   const [accessibilityMode, setAccessibilityMode] = useState(() => getStoredAccessibility())
+  const [darkTheme, setDarkTheme] = useState(() => getStoredDarkTheme())
   const location = useLocation()
 
   useEffect(() => {
@@ -57,7 +81,19 @@ export default function Layout() {
   }, [accessibilityMode])
 
   useEffect(() => {
-    const title = PAGE_TITLES[location.pathname] ?? 'Портфолио педагога'
+    try {
+      if (darkTheme) {
+        localStorage.setItem(DARK_THEME_KEY, '1')
+        document.documentElement.classList.add('dark-theme')
+      } else {
+        localStorage.removeItem(DARK_THEME_KEY)
+        document.documentElement.classList.remove('dark-theme')
+      }
+    } catch { }
+  }, [darkTheme])
+
+  useEffect(() => {
+    const title = PAGE_TITLES[location.pathname] ?? `${TITLE_PREFIX}Портфолио`
     document.title = title
   }, [location.pathname])
 
@@ -134,17 +170,44 @@ export default function Layout() {
           <Link to="/" className="logo">
             Сайт Крумовой Э.М.
           </Link>
-          <Link
-            to="/cabinet"
-            className="cabinet-icon-link"
-            aria-label="Личный кабинет"
-            title="Личный кабинет"
-          >
-            <svg className="cabinet-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-              <circle cx="12" cy="7" r="4" />
-            </svg>
-          </Link>
+          <div className="header-actions">
+            <button
+              type="button"
+              className="theme-toggle"
+              onClick={() => setDarkTheme((v) => !v)}
+              aria-label={darkTheme ? 'Включить светлую тему' : 'Включить тёмную тему'}
+              title={darkTheme ? 'Светлая тема' : 'Тёмная тема'}
+            >
+              {darkTheme ? (
+                <svg className="theme-toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="5" />
+                  <line x1="12" y1="1" x2="12" y2="3" />
+                  <line x1="12" y1="21" x2="12" y2="23" />
+                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                  <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                  <line x1="1" y1="12" x2="3" y2="12" />
+                  <line x1="21" y1="12" x2="23" y2="12" />
+                  <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                  <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                </svg>
+              ) : (
+                <svg className="theme-toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                </svg>
+              )}
+            </button>
+            <Link
+              to="/cabinet"
+              className="cabinet-icon-link"
+              aria-label="Личный кабинет"
+              title="Личный кабинет"
+            >
+              <svg className="cabinet-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+            </Link>
+          </div>
         </div>
       </header>
 

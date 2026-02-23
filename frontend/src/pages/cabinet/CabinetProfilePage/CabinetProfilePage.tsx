@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
-import { getProfile, updateProfile, logout, getAllUsers, updateUserRole, isAdmin } from '../../../api/auth'
+import { getProfile, updateProfile, sendProfileCode, verifyProfileUpdate, logout, getAllUsers, updateUserRole, isAdmin } from '../../../api/auth'
 import { fetchContent, updateContent, uploadProfilePhoto, deleteProfilePhoto } from '../../../api/content'
 import './CabinetProfilePage.css'
 
@@ -116,6 +116,34 @@ export default function CabinetProfilePage() {
     mutationFn: updateProfile,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['profile'] }),
   })
+  const [profileStep, setProfileStep] = useState<'form' | 'code'>('form')
+  const [pendingProfile, setPendingProfile] = useState<{ fullName: string | null; email: string | null } | null>(null)
+  const [profileCode, setProfileCode] = useState('')
+  const [sendCodeLoading, setSendCodeLoading] = useState(false)
+  const [profileCodeError, setProfileCodeError] = useState<string | null>(null)
+  const [profileFormError, setProfileFormError] = useState<string | null>(null)
+  const [profileFullName, setProfileFullName] = useState('')
+  const [profileEmail, setProfileEmail] = useState('')
+  useEffect(() => {
+    if (profile) {
+      setProfileFullName(profile.fullName ?? '')
+      setProfileEmail(profile.email ?? '')
+    }
+  }, [profile])
+  const verifyProfileMutation = useMutation({
+    mutationFn: (code: string) => verifyProfileUpdate(code, pendingProfile!),
+    onSuccess: (updated) => {
+      queryClient.setQueryData(['profile'], updated)
+      queryClient.invalidateQueries({ queryKey: ['profile'] })
+      setProfileStep('form')
+      setPendingProfile(null)
+      setProfileCode('')
+      setProfileCodeError(null)
+      setProfileFullName(updated.fullName ?? '')
+      setProfileEmail(updated.email ?? '')
+    },
+    onError: (err) => setProfileCodeError(err instanceof Error ? err.message : 'Ошибка'),
+  })
   const updateRoleMutation = useMutation({
     mutationFn: ({ userId, role }: { userId: number; role: 'user' | 'admin' }) => updateUserRole(userId, role),
     onSuccess: () => {
@@ -186,12 +214,37 @@ export default function CabinetProfilePage() {
     }
   }, [aboutContent])
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    const form = e.currentTarget
-    const fullName = (form.elements.namedItem('fullName') as HTMLInputElement).value.trim() || null
-    const email = (form.elements.namedItem('email') as HTMLInputElement).value.trim() || null
-    updateMutation.mutate({ fullName, email })
+    setProfileFormError(null)
+    const fullName = profileFullName.trim() || null
+    const email = profileEmail.trim() || null
+    const emailChanged = email !== (profile?.email ?? '')
+    if (emailChanged) {
+      const targetEmail = (email || '').trim()
+      if (!targetEmail) {
+        setProfileFormError('Укажите новый email для отправки кода подтверждения')
+        return
+      }
+      setProfileCodeError(null)
+      setSendCodeLoading(true)
+      try {
+        await sendProfileCode(targetEmail)
+        setPendingProfile({ fullName, email: email || null })
+        setProfileStep('code')
+      } catch (err) {
+        setProfileFormError(err instanceof Error ? err.message : 'Ошибка отправки кода')
+      } finally {
+        setSendCodeLoading(false)
+      }
+      return
+    }
+    updateMutation.mutate({ fullName, email }, {
+      onSuccess: (updated) => {
+        setProfileFullName(updated.fullName ?? '')
+        setProfileEmail(updated.email ?? '')
+      },
+    })
   }
 
   const handleLogout = async () => {
@@ -222,6 +275,40 @@ export default function CabinetProfilePage() {
   return (
     <div className="card cabinet-form-card">
       <h2>Информация о профиле</h2>
+      {profileStep === 'code' ? (
+        <div className="contact-form">
+          <p className="muted" style={{ marginBottom: '0.5rem' }}>
+            На почту {pendingProfile?.email} отправлен код подтверждения. Введите его ниже.
+          </p>
+          <div className="form-group">
+            <label htmlFor="profile-code">Код из письма</label>
+            <input
+              id="profile-code"
+              type="text"
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              value={profileCode}
+              onChange={(e) => setProfileCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+              placeholder="000000"
+              maxLength={6}
+            />
+          </div>
+          {profileCodeError && <p className="error">{profileCodeError}</p>}
+          <div className="form-actions">
+            <button type="button" className="btn btn-secondary" onClick={() => { setProfileStep('form'); setPendingProfile(null); setProfileCode(''); setProfileCodeError(null) }}>
+              Назад
+            </button>
+            <button
+              type="button"
+              className="btn btn-primary"
+              disabled={profileCode.length !== 6 || verifyProfileMutation.isPending}
+              onClick={() => verifyProfileMutation.mutate(profileCode)}
+            >
+              {verifyProfileMutation.isPending ? 'Сохранение...' : 'Подтвердить'}
+            </button>
+          </div>
+        </div>
+      ) : (
       <form className="contact-form" onSubmit={handleSubmit}>
         <div className="form-group">
           <label htmlFor="profile-fullName">ФИО</label>
@@ -229,7 +316,8 @@ export default function CabinetProfilePage() {
             id="profile-fullName"
             name="fullName"
             type="text"
-            defaultValue={profile.fullName ?? ''}
+            value={profileFullName}
+            onChange={(e) => setProfileFullName(e.target.value)}
             placeholder="Введите ФИО"
           />
         </div>
@@ -239,13 +327,14 @@ export default function CabinetProfilePage() {
             id="profile-email"
             name="email"
             type="email"
-            defaultValue={profile.email ?? ''}
+            value={profileEmail}
+            onChange={(e) => setProfileEmail(e.target.value)}
             placeholder="example@mail.ru"
           />
         </div>
         <div className="form-actions">
-          <button type="submit" className="btn btn-primary" disabled={updateMutation.isPending}>
-            Сохранить
+          <button type="submit" className="btn btn-primary" disabled={updateMutation.isPending || sendCodeLoading}>
+            {sendCodeLoading ? 'Отправка кода...' : 'Сохранить'}
           </button>
           <button type="button" className="btn cabinet-logout" onClick={handleLogout}>
             Выйти
@@ -257,7 +346,9 @@ export default function CabinetProfilePage() {
             {updateMutation.error instanceof Error ? updateMutation.error.message : 'Ошибка сохранения'}
           </p>
         )}
+        {profileFormError && <p className="error">{profileFormError}</p>}
       </form>
+      )}
 
       {admin && (
       <div className="card cabinet-form-card" style={{ marginTop: '2rem' }}>
@@ -660,6 +751,7 @@ export default function CabinetProfilePage() {
                 {(showAllUsers ? users : users.slice(0, 3)).map((user) => (
                   <div
                     key={user.id}
+                    className="cabinet-user-card"
                     style={{
                       display: 'flex',
                       alignItems: 'center',
@@ -673,7 +765,7 @@ export default function CabinetProfilePage() {
                     <span style={{ fontWeight: user.role === 'admin' ? 500 : 400 }}>
                       {user.fullName || `Пользователь #${user.id}`}
                       {user.role === 'admin' && (
-                        <span style={{ marginLeft: '0.5rem', color: '#3498db', fontSize: '0.875rem' }}>(админ)</span>
+                        <span className="cabinet-user-admin-badge" style={{ marginLeft: '0.5rem', color: '#3498db', fontSize: '0.875rem' }}>(админ)</span>
                       )}
                     </span>
                     <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>

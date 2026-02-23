@@ -3,6 +3,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { MailModule } from './mail/mail.module';
 import { AuthModule } from './auth/auth.module';
 import { AchievementsModule } from './achievements/achievements.module';
 import { ContentModule } from './content/content.module';
@@ -26,6 +27,7 @@ import { SyncNewsModule } from './sync-news/sync-news.module';
       autoLoadEntities: true,
       synchronize: process.env.NODE_ENV !== 'production',
     }),
+    MailModule,
     AuthModule,
     ContentModule,
     NewsModule,

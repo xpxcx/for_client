@@ -24,6 +24,9 @@ function toResponse(row) {
         title: row.title,
         text: row.text,
         sourceType: row.sourceType ?? (row.achievementId != null ? 'achievement' : null),
+        achievementId: row.achievementId ?? null,
+        materialId: row.materialId ?? null,
+        linkId: row.linkId ?? null,
     };
 }
 let NewsService = class NewsService {

@@ -1,1 +1,47 @@
+.cabinet-form-card .profile-collapsible-group .profile-collapsible-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0;
+}
 
+.cabinet-form-card .profile-collapsible-group .profile-collapsible-header label {
+  margin: 0;
+}
+
+.cabinet-form-card .profile-collapsible-group .profile-collapsible-header + * {
+  margin-top: 1rem;
+}
+
+.cabinet-form-card .btn-collapsible-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.65rem;
+  font-size: 0.875rem;
+  background: #fff;
+  color: #3498db;
+  border: 1px solid #3498db;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.cabinet-form-card .btn-collapsible-toggle:hover {
+  background: #3498db;
+  color: #fff;
+}
+
+.cabinet-form-card .profile-collapsible-arrow {
+  flex-shrink: 0;
+  transition: transform 0.2s;
+}
+
+.cabinet-form-card .profile-collapsible-arrow.rotated {
+  transform: rotate(180deg);
+}
+
+.cabinet-form-card .contact-info-social-edit-header {
+  margin-bottom: 0.5rem;
+}

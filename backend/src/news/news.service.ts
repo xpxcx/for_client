@@ -9,6 +9,9 @@ export interface NewsItem {
   title: string;
   text: string;
   sourceType: string | null;
+  achievementId: number | null;
+  materialId: number | null;
+  linkId: number | null;
 }
 
 function toResponse(row: News): NewsItem {
@@ -18,6 +21,9 @@ function toResponse(row: News): NewsItem {
     title: row.title,
     text: row.text,
     sourceType: row.sourceType ?? (row.achievementId != null ? 'achievement' : null),
+    achievementId: row.achievementId ?? null,
+    materialId: row.materialId ?? null,
+    linkId: row.linkId ?? null,
   };
 }
 

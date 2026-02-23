@@ -66,6 +66,20 @@ let AuthController = class AuthController {
         });
         return { access_token: tokens.access_token };
     }
+    async sendRegisterCode(body) {
+        await this.authService.sendRegisterCode(body.email);
+        return { success: true };
+    }
+    async registerVerify(body, res) {
+        const tokens = await this.authService.verifyAndRegister(body.email, body.code, body.password);
+        res.cookie('refresh_token', tokens.refresh_token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+        });
+        return { access_token: tokens.access_token };
+    }
     async register(body, res) {
         const tokens = await this.authService.register(body.username, body.password);
         res.cookie('refresh_token', tokens.refresh_token, {
@@ -75,6 +89,14 @@ let AuthController = class AuthController {
             maxAge: 7 * 24 * 60 * 60 * 1000,
         });
         return { access_token: tokens.access_token };
+    }
+    async forgotPassword(body) {
+        await this.authService.sendResetCode(body.email);
+        return { success: true };
+    }
+    async resetPassword(body) {
+        await this.authService.resetPassword(body.email, body.code, body.newPassword);
+        return { success: true };
     }
     async refresh(req) {
         const refreshToken = req.cookies?.['refresh_token'];
@@ -101,6 +123,16 @@ let AuthController = class AuthController {
     getProfile(req) {
         return this.authService.getProfile(req.user.id);
     }
+    sendProfileCode(req, body) {
+        return this.authService.sendProfileCode(req.user.id, body.email);
+    }
+    verifyProfileUpdate(req, body) {
+        return this.authService.verifyProfileUpdate(req.user.id, body.code, {
+            fullName: body.fullName,
+            email: body.email,
+            newPassword: body.newPassword,
+        });
+    }
     updateProfile(req, body) {
         return this.authService.updateProfile(req.user.id, body);
     }
@@ -115,6 +147,21 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "login", null);
 __decorate([
+    (0, common_1.Post)('register/send-code'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "sendRegisterCode", null);
+__decorate([
+    (0, common_1.Post)('register/verify'),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Res)({ passthrough: true })),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "registerVerify", null);
+__decorate([
     (0, common_1.Post)('register'),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Res)({ passthrough: true })),
@@ -122,6 +169,20 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "register", null);
+__decorate([
+    (0, common_1.Post)('forgot-password'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "forgotPassword", null);
+__decorate([
+    (0, common_1.Post)('reset-password'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "resetPassword", null);
 __decorate([
     (0, common_1.Post)('refresh'),
     __param(0, (0, common_1.Req)()),
@@ -162,6 +223,24 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "getProfile", null);
+__decorate([
+    (0, common_1.Post)('profile/send-code'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "sendProfileCode", null);
+__decorate([
+    (0, common_1.Patch)('profile/verify'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "verifyProfileUpdate", null);
 __decorate([
     (0, common_1.Patch)('profile'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),

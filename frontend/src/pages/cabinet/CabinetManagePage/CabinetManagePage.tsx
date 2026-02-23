@@ -10,6 +10,7 @@ import {
   updateAchievement,
   uploadImage,
 } from '../../../api/achievements'
+import Pagination, { PAGE_SIZE } from '../../../components/Pagination'
 import './CabinetManagePage.css'
 
 function formatDate(dateStr: string) {
@@ -29,6 +30,7 @@ export default function CabinetManagePage() {
   const [showAdd, setShowAdd] = useState(false)
   const [replaceFile, setReplaceFile] = useState<File | null>(null)
   const [addFile, setAddFile] = useState<File | null>(null)
+  const [page, setPage] = useState(1)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const addFileInputRef = useRef<HTMLInputElement>(null)
   const queryClient = useQueryClient()
@@ -323,8 +325,9 @@ export default function CabinetManagePage() {
         {items.length === 0 ? (
           <p className="cabinet-empty-message">Достижений пока нет. Нажмите «Добавить достижение» выше.</p>
         ) : (
+          <>
           <div className="achievements-list">
-          {items.map((item) => (
+          {items.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE).map((item) => (
             <article key={item.id} className="card achievement-item achievement-card">
               <div className="achievement-actions">
                 <button
@@ -361,6 +364,8 @@ export default function CabinetManagePage() {
             </article>
           ))}
           </div>
+          <Pagination totalItems={items.length} currentPage={page} onPageChange={setPage} />
+          </>
         )}
       </div>
     </>

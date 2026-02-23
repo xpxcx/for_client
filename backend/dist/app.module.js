@@ -12,6 +12,7 @@ const throttler_1 = require("@nestjs/throttler");
 const typeorm_1 = require("@nestjs/typeorm");
 const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
+const mail_module_1 = require("./mail/mail.module");
 const auth_module_1 = require("./auth/auth.module");
 const achievements_module_1 = require("./achievements/achievements.module");
 const content_module_1 = require("./content/content.module");
@@ -38,6 +39,7 @@ exports.AppModule = AppModule = __decorate([
                 autoLoadEntities: true,
                 synchronize: process.env.NODE_ENV !== 'production',
             }),
+            mail_module_1.MailModule,
             auth_module_1.AuthModule,
             content_module_1.ContentModule,
             news_module_1.NewsModule,

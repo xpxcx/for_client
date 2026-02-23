@@ -13,6 +13,7 @@ export default function CabinetContactInfoPage() {
   const [phone, setPhone] = useState('')
   const [email, setEmail] = useState('')
   const [socialNetworks, setSocialNetworks] = useState<SocialNetworkItem[]>([])
+  const [socialExpanded, setSocialExpanded] = useState(false)
 
   const { data, isLoading, error } = useQuery({
     queryKey: contactInfoKeys.get(),
@@ -97,45 +98,71 @@ export default function CabinetContactInfoPage() {
               placeholder="example@mail.ru"
             />
           </div>
-          <div className="form-group">
-            <div className="contact-info-social-edit-header">
+          <div className="form-group profile-collapsible-group">
+            <div className="profile-collapsible-header">
               <label>Социальные сети</label>
-              <button type="button" className="btn btn-secondary btn-small" onClick={addSocial}>
-                Добавить
+              <button
+                type="button"
+                className="btn btn-collapsible-toggle"
+                onClick={() => setSocialExpanded((v) => !v)}
+              >
+                {socialExpanded ? 'Скрыть' : 'Показать'}
+                <svg
+                  className={`profile-collapsible-arrow ${socialExpanded ? 'rotated' : ''}`}
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <polyline points="6 9 12 15 18 9" />
+                </svg>
               </button>
             </div>
-            {socialNetworks.length === 0 ? (
-              <p className="form-hint">Нет добавленных ссылок. Нажмите «Добавить».</p>
-            ) : (
-              <ul className="cabinet-list">
-                {socialNetworks.map((sn, index) => (
-                  <li key={index} className="cabinet-list-item contact-social-edit-item">
-                    <div className="contact-social-edit-fields">
-                      <input
-                        type="text"
-                        value={sn.name}
-                        onChange={(e) => updateSocial(index, 'name', e.target.value)}
-                        placeholder="Название (например: ВКонтакте)"
-                        className="contact-social-edit-name"
-                      />
-                      <input
-                        type="url"
-                        value={sn.url}
-                        onChange={(e) => updateSocial(index, 'url', e.target.value)}
-                        placeholder="https://..."
-                        className="contact-social-edit-url"
-                      />
-                    </div>
-                    <button
-                      type="button"
-                      className="btn btn-small btn-danger"
-                      onClick={() => removeSocial(index)}
-                    >
-                      Удалить
-                    </button>
-                  </li>
-                ))}
-              </ul>
+            {socialExpanded && (
+              <>
+                <div className="contact-info-social-edit-header">
+                  <button type="button" className="btn btn-secondary btn-small" onClick={addSocial}>
+                    Добавить
+                  </button>
+                </div>
+                {socialNetworks.length === 0 ? (
+                  <p className="form-hint">Нет добавленных ссылок. Нажмите «Добавить».</p>
+                ) : (
+                  <ul className="cabinet-list">
+                    {socialNetworks.map((sn, index) => (
+                      <li key={index} className="cabinet-list-item contact-social-edit-item">
+                        <div className="contact-social-edit-fields">
+                          <input
+                            type="text"
+                            value={sn.name}
+                            onChange={(e) => updateSocial(index, 'name', e.target.value)}
+                            placeholder="Название (например: ВКонтакте)"
+                            className="contact-social-edit-name"
+                          />
+                          <input
+                            type="url"
+                            value={sn.url}
+                            onChange={(e) => updateSocial(index, 'url', e.target.value)}
+                            placeholder="https://..."
+                            className="contact-social-edit-url"
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          className="btn btn-small btn-danger"
+                          onClick={() => removeSocial(index)}
+                        >
+                          Удалить
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </>
             )}
           </div>
           <div className="form-actions">

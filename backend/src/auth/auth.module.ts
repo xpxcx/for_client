@@ -4,6 +4,7 @@ import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import { RefreshToken } from './refresh-token.entity';
+import { EmailVerification } from './email-verification.entity';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
@@ -12,7 +13,7 @@ import { AdminGuard } from './admin.guard';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, RefreshToken]),
+    TypeOrmModule.forFeature([User, RefreshToken, EmailVerification]),
     PassportModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET ?? 'portfolio-secret-change-in-production',

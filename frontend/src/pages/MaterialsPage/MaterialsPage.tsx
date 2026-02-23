@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import type { Material } from '../../api/materials'
 import { materialsKeys, fetchMaterials } from '../../api/materials'
@@ -8,7 +8,7 @@ import './MaterialsPage.css'
 
 function MaterialCard({ item }: { item: Material }) {
   return (
-    <article className="card material-card">
+    <article id={`material-${item.id}`} className="card material-card">
       <div className="material-info-item">
         <span className="material-info-label">Название</span>
         <span className="material-info-value material-info-title">{item.title}</span>
@@ -37,6 +37,32 @@ export default function MaterialsPage() {
     queryKey: materialsKeys.list(),
     queryFn: fetchMaterials,
   })
+
+  useEffect(() => {
+    const m = window.location.hash.match(/^#material-(\d+)$/)
+    if (!m || !items.length) return
+    const id = m[1]
+    const index = items.findIndex((i) => String(i.id) === id)
+    if (index < 0) return
+    const targetPage = Math.floor(index / PAGE_SIZE) + 1
+    setPage((p) => (p === targetPage ? p : targetPage))
+  }, [items])
+
+  useEffect(() => {
+    const m = window.location.hash.match(/^#material-(\d+)$/)
+    if (!m) return
+    const id = m[1]
+    const t = setTimeout(() => {
+      const el = document.getElementById(`material-${id}`)
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        el.classList.add('news-target-highlight')
+        const t2 = setTimeout(() => el.classList.remove('news-target-highlight'), 2600)
+        return () => clearTimeout(t2)
+      }
+    }, 100)
+    return () => clearTimeout(t)
+  }, [page, items])
 
   if (isLoading) {
     return (
