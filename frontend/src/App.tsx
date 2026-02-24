@@ -18,6 +18,8 @@ import CabinetMaterialsPage from './pages/cabinet/CabinetMaterialsPage/CabinetMa
 import CabinetNewsPage from './pages/cabinet/CabinetNewsPage/CabinetNewsPage'
 import CabinetLinksPage from './pages/cabinet/CabinetLinksPage/CabinetLinksPage'
 import CabinetContactInfoPage from './pages/cabinet/CabinetContactInfoPage/CabinetContactInfoPage'
+import CabinetMenuPage from './pages/cabinet/CabinetMenuPage/CabinetMenuPage'
+import CabinetSectionPage from './pages/cabinet/CabinetSectionPage/CabinetSectionPage'
 import './App.css'
 import './AboutSection.css'
 import './Accessibility.css'
@@ -84,6 +86,22 @@ export default function App() {
               element={
                 <AdminRoute>
                   <CabinetContactInfoPage />
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="menu"
+              element={
+                <AdminRoute>
+                  <CabinetMenuPage />
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="section/:id"
+              element={
+                <AdminRoute>
+                  <CabinetSectionPage />
                 </AdminRoute>
               }
             />

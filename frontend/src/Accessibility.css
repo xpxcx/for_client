@@ -1,14 +1,14 @@
 .accessibility-mode {
-  font-size: 18px;
+  font-size: calc(16px * var(--accessibility-font-scale, 1));
 }
 
 .accessibility-mode body,
 .accessibility-mode #root {
-  font-size: 1.125rem;
+  font-size: calc(1.125rem * var(--accessibility-font-scale, 1));
 }
 
 .accessibility-mode .main {
-  font-size: 1.25rem;
+  font-size: calc(1.25rem * var(--accessibility-font-scale, 1));
   line-height: 1.65;
   letter-spacing: 0.02em;
 }
@@ -16,20 +16,20 @@
 .accessibility-mode .page h1,
 .accessibility-mode .card h1,
 .accessibility-mode .card h2 {
-  font-size: 1.75rem;
+  font-size: calc(1.75rem * var(--accessibility-font-scale, 1));
   color: #000;
   font-weight: 700;
 }
 
 .accessibility-mode .page h2,
 .accessibility-mode .card h3 {
-  font-size: 1.5rem;
+  font-size: calc(1.5rem * var(--accessibility-font-scale, 1));
   color: #000;
   font-weight: 700;
 }
 
 .accessibility-mode .page h3 {
-  font-size: 1.35rem;
+  font-size: calc(1.35rem * var(--accessibility-font-scale, 1));
   color: #111;
   font-weight: 600;
 }
@@ -48,7 +48,7 @@
 .accessibility-mode .contact-form input,
 .accessibility-mode .contact-form textarea,
 .accessibility-mode .contact-form select {
-  font-size: 1.125rem;
+  font-size: calc(1.125rem * var(--accessibility-font-scale, 1));
 }
 
 .accessibility-mode .contact-form label,
@@ -70,13 +70,13 @@
 
 .accessibility-mode .news-date,
 .accessibility-mode .achievement-date {
-  font-size: 1rem;
+  font-size: calc(1rem * var(--accessibility-font-scale, 1));
   font-weight: 600;
 }
 
 .accessibility-mode .news-title,
 .accessibility-mode .achievement-title {
-  font-size: 1.35rem;
+  font-size: calc(1.35rem * var(--accessibility-font-scale, 1));
   font-weight: 700;
   color: #000;
 }
@@ -94,7 +94,7 @@
 }
 
 .accessibility-mode .btn {
-  font-size: 1.125rem;
+  font-size: calc(1.125rem * var(--accessibility-font-scale, 1));
   padding: 0.75rem 1.5rem;
   border-width: 2px;
   font-weight: 600;
@@ -122,5 +122,197 @@
 }
 
 .accessibility-mode .cabinet-list-card .achievement-actions .btn {
-  font-size: 1rem;
+  font-size: calc(1rem * var(--accessibility-font-scale, 1));
+}
+
+.accessibility-mode.accessibility-images-off img {
+  display: none !important;
+}
+
+.accessibility-mode.accessibility-images-grayscale img {
+  filter: grayscale(100%);
+}
+
+.accessibility-mode.accessibility-scheme-inverted body,
+.accessibility-mode.accessibility-scheme-inverted #root,
+.accessibility-mode.accessibility-scheme-inverted .main {
+  background: #000 !important;
+  color: #fff !important;
+}
+
+.accessibility-mode.accessibility-scheme-inverted .card {
+  background: #111 !important;
+  color: #fff !important;
+  border-color: #444 !important;
+}
+
+.accessibility-mode.accessibility-scheme-inverted .page h1,
+.accessibility-mode.accessibility-scheme-inverted .card h1,
+.accessibility-mode.accessibility-scheme-inverted .card h2,
+.accessibility-mode.accessibility-scheme-inverted .page h2,
+.accessibility-mode.accessibility-scheme-inverted .card h3,
+.accessibility-mode.accessibility-scheme-inverted .page h3,
+.accessibility-mode.accessibility-scheme-inverted .about-fio,
+.accessibility-mode.accessibility-scheme-inverted .news-date,
+.accessibility-mode.accessibility-scheme-inverted .news-title,
+.accessibility-mode.accessibility-scheme-inverted .achievement-date,
+.accessibility-mode.accessibility-scheme-inverted .achievement-title,
+.accessibility-mode.accessibility-scheme-inverted .achievement-desc,
+.accessibility-mode.accessibility-scheme-inverted .achievement-info-label,
+.accessibility-mode.accessibility-scheme-inverted .achievement-info-value,
+.accessibility-mode.accessibility-scheme-inverted .achievement-info-desc,
+.accessibility-mode.accessibility-scheme-inverted .contact-form label,
+.accessibility-mode.accessibility-scheme-inverted .form-group label {
+  color: #fff !important;
+}
+
+.accessibility-mode.accessibility-scheme-inverted .page a,
+.accessibility-mode.accessibility-scheme-inverted .card a {
+  color: #7dd3fc !important;
+}
+
+.accessibility-mode.accessibility-scheme-inverted .contact-form input,
+.accessibility-mode.accessibility-scheme-inverted .contact-form textarea,
+.accessibility-mode.accessibility-scheme-inverted .contact-form select {
+  background: #222 !important;
+  border-color: #555 !important;
+  color: #fff !important;
+}
+
+.accessibility-mode.accessibility-scheme-blue body,
+.accessibility-mode.accessibility-scheme-blue #root,
+.accessibility-mode.accessibility-scheme-blue .main {
+  background: #cce5ff !important;
+  color: #003d82 !important;
+}
+
+.accessibility-mode.accessibility-scheme-blue .card {
+  background: #e6f2ff !important;
+  color: #002952 !important;
+  border-color: #003d82 !important;
+}
+
+.accessibility-mode.accessibility-scheme-blue .page h1,
+.accessibility-mode.accessibility-scheme-blue .card h1,
+.accessibility-mode.accessibility-scheme-blue .card h2,
+.accessibility-mode.accessibility-scheme-blue .page h2,
+.accessibility-mode.accessibility-scheme-blue .card h3,
+.accessibility-mode.accessibility-scheme-blue .page h3,
+.accessibility-mode.accessibility-scheme-blue .about-fio,
+.accessibility-mode.accessibility-scheme-blue .news-date,
+.accessibility-mode.accessibility-scheme-blue .news-title,
+.accessibility-mode.accessibility-scheme-blue .achievement-date,
+.accessibility-mode.accessibility-scheme-blue .achievement-title,
+.accessibility-mode.accessibility-scheme-blue .achievement-desc,
+.accessibility-mode.accessibility-scheme-blue .achievement-info-label,
+.accessibility-mode.accessibility-scheme-blue .achievement-info-value,
+.accessibility-mode.accessibility-scheme-blue .achievement-info-desc,
+.accessibility-mode.accessibility-scheme-blue .contact-form label,
+.accessibility-mode.accessibility-scheme-blue .form-group label {
+  color: #001a3d !important;
+}
+
+.accessibility-mode.accessibility-scheme-blue .page a,
+.accessibility-mode.accessibility-scheme-blue .card a {
+  color: #0066cc !important;
+}
+
+.accessibility-mode.accessibility-scheme-blue .contact-form input,
+.accessibility-mode.accessibility-scheme-blue .contact-form textarea,
+.accessibility-mode.accessibility-scheme-blue .contact-form select {
+  background: #fff !important;
+  border-color: #003d82 !important;
+  color: #001a3d !important;
+}
+
+.accessibility-mode.accessibility-scheme-yellow body,
+.accessibility-mode.accessibility-scheme-yellow #root,
+.accessibility-mode.accessibility-scheme-yellow .main {
+  background: #fff9c4 !important;
+  color: #000 !important;
+}
+
+.accessibility-mode.accessibility-scheme-yellow .card {
+  background: #fffde7 !important;
+  color: #000 !important;
+  border-color: #333 !important;
+}
+
+.accessibility-mode.accessibility-scheme-yellow .page h1,
+.accessibility-mode.accessibility-scheme-yellow .card h1,
+.accessibility-mode.accessibility-scheme-yellow .card h2,
+.accessibility-mode.accessibility-scheme-yellow .page h2,
+.accessibility-mode.accessibility-scheme-yellow .card h3,
+.accessibility-mode.accessibility-scheme-yellow .page h3,
+.accessibility-mode.accessibility-scheme-yellow .about-fio,
+.accessibility-mode.accessibility-scheme-yellow .news-date,
+.accessibility-mode.accessibility-scheme-yellow .news-title,
+.accessibility-mode.accessibility-scheme-yellow .achievement-date,
+.accessibility-mode.accessibility-scheme-yellow .achievement-title,
+.accessibility-mode.accessibility-scheme-yellow .achievement-desc,
+.accessibility-mode.accessibility-scheme-yellow .achievement-info-label,
+.accessibility-mode.accessibility-scheme-yellow .achievement-info-value,
+.accessibility-mode.accessibility-scheme-yellow .achievement-info-desc,
+.accessibility-mode.accessibility-scheme-yellow .contact-form label,
+.accessibility-mode.accessibility-scheme-yellow .form-group label {
+  color: #000 !important;
+}
+
+.accessibility-mode.accessibility-scheme-yellow .page a,
+.accessibility-mode.accessibility-scheme-yellow .card a {
+  color: #0066cc !important;
+}
+
+.accessibility-mode.accessibility-scheme-yellow .contact-form input,
+.accessibility-mode.accessibility-scheme-yellow .contact-form textarea,
+.accessibility-mode.accessibility-scheme-yellow .contact-form select {
+  background: #fff !important;
+  border-color: #333 !important;
+  color: #000 !important;
+}
+
+.accessibility-mode.accessibility-scheme-brown body,
+.accessibility-mode.accessibility-scheme-brown #root,
+.accessibility-mode.accessibility-scheme-brown .main {
+  background: #3e2723 !important;
+  color: #81c784 !important;
+}
+
+.accessibility-mode.accessibility-scheme-brown .card {
+  background: #4e342e !important;
+  color: #a5d6a7 !important;
+  border-color: #81c784 !important;
+}
+
+.accessibility-mode.accessibility-scheme-brown .page h1,
+.accessibility-mode.accessibility-scheme-brown .card h1,
+.accessibility-mode.accessibility-scheme-brown .card h2,
+.accessibility-mode.accessibility-scheme-brown .page h2,
+.accessibility-mode.accessibility-scheme-brown .card h3,
+.accessibility-mode.accessibility-scheme-brown .page h3,
+.accessibility-mode.accessibility-scheme-brown .about-fio,
+.accessibility-mode.accessibility-scheme-brown .news-date,
+.accessibility-mode.accessibility-scheme-brown .news-title,
+.accessibility-mode.accessibility-scheme-brown .achievement-date,
+.accessibility-mode.accessibility-scheme-brown .achievement-title,
+.accessibility-mode.accessibility-scheme-brown .achievement-desc,
+.accessibility-mode.accessibility-scheme-brown .achievement-info-label,
+.accessibility-mode.accessibility-scheme-brown .achievement-info-value,
+.accessibility-mode.accessibility-scheme-brown .achievement-info-desc,
+.accessibility-mode.accessibility-scheme-brown .contact-form label,
+.accessibility-mode.accessibility-scheme-brown .form-group label {
+  color: #c8e6c9 !important;
+}
+
+.accessibility-mode.accessibility-scheme-brown .page a,
+.accessibility-mode.accessibility-scheme-brown .card a {
+  color: #81c784 !important;
+}
+
+.accessibility-mode.accessibility-scheme-brown .contact-form input,
+.accessibility-mode.accessibility-scheme-brown .contact-form textarea,
+.accessibility-mode.accessibility-scheme-brown .contact-form select {
+  background: #5d4037 !important;
+  border-color: #81c784 !important;
+  color: #c8e6c9 !important;
 }

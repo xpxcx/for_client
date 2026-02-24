@@ -159,6 +159,10 @@
   border-color: #3498db;
 }
 
+.layout.has-accessibility-toolbar .header {
+  top: 3.25rem;
+}
+
 .header {
   background: #2c3e50;
   color: #fff;

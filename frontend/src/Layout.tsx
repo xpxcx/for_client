@@ -1,14 +1,11 @@
 import { useState, useEffect } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { Link, Outlet, useLocation } from 'react-router-dom'
 import CookieNotice from './components/CookieNotice'
+import AccessibilityToolbar, { type AccessibilityColorScheme, type AccessibilityImagesMode } from './components/AccessibilityToolbar/AccessibilityToolbar'
+import { menuKeys, fetchSections, type Section } from './api/menu'
 import './Layout.css'
 import './DarkTheme.css'
-
-interface Section {
-  id: string
-  title: string
-  path: string
-}
 
 const FALLBACK_SECTIONS: Section[] = [
   { id: 'about', title: 'О себе', path: '/' },
@@ -19,7 +16,7 @@ const FALLBACK_SECTIONS: Section[] = [
   { id: 'links', title: 'Полезные ссылки', path: '/links' },
 ]
 
-const TITLE_PREFIX = 'Крумова Эльмира Мамедовна - '
+const TITLE_PREFIX = 'Крумова Эльмира Мамедовна, Сургут - '
 
 const PAGE_TITLES: Record<string, string> = {
   '/': `${TITLE_PREFIX}О себе`,
@@ -40,10 +37,16 @@ const PAGE_TITLES: Record<string, string> = {
   '/cabinet/news': `${TITLE_PREFIX}Управление новостями`,
   '/cabinet/links': `${TITLE_PREFIX}Управление полезными ссылками`,
   '/cabinet/contact-info': `${TITLE_PREFIX}Контактная информация`,
+  '/cabinet/menu': `${TITLE_PREFIX}Управление меню`,
 }
 
 const STORAGE_KEY = 'accessibilityMode'
 const DARK_THEME_KEY = 'darkTheme'
+const ACC_FONT_KEY = 'accessibilityFontSizePt'
+const ACC_SCHEME_KEY = 'accessibilityColorScheme'
+const ACC_IMAGES_KEY = 'accessibilityImagesMode'
+
+const DEFAULT_FONT_PT = 18
 
 function getStoredAccessibility(): boolean {
   try {
@@ -61,11 +64,42 @@ function getStoredDarkTheme(): boolean {
   }
 }
 
+function getStoredAccFont(): number {
+  try {
+    const v = parseInt(localStorage.getItem(ACC_FONT_KEY) ?? '', 10)
+    return Number.isFinite(v) && v >= 12 && v <= 24 ? v : DEFAULT_FONT_PT
+  } catch {
+    return DEFAULT_FONT_PT
+  }
+}
+
+function getStoredAccScheme(): AccessibilityColorScheme {
+  try {
+    const v = localStorage.getItem(ACC_SCHEME_KEY) as AccessibilityColorScheme | null
+    return v && ['default', 'inverted', 'blue', 'yellow', 'brown'].includes(v) ? v : 'default'
+  } catch {
+    return 'default'
+  }
+}
+
+function getStoredAccImages(): AccessibilityImagesMode {
+  try {
+    const v = localStorage.getItem(ACC_IMAGES_KEY) as AccessibilityImagesMode | null
+    return v && ['on', 'off', 'grayscale'].includes(v) ? v : 'on'
+  } catch {
+    return 'on'
+  }
+}
+
 export default function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [sections, setSections] = useState<Section[]>(FALLBACK_SECTIONS)
+  const { data: sectionsData } = useQuery({ queryKey: menuKeys.list(), queryFn: fetchSections })
+  const sections = sectionsData ?? FALLBACK_SECTIONS
   const [accessibilityMode, setAccessibilityMode] = useState(() => getStoredAccessibility())
   const [darkTheme, setDarkTheme] = useState(() => getStoredDarkTheme())
+  const [accessibilityFontSizePt, setAccessibilityFontSizePt] = useState(getStoredAccFont)
+  const [accessibilityColorScheme, setAccessibilityColorScheme] = useState<AccessibilityColorScheme>(getStoredAccScheme)
+  const [accessibilityImagesMode, setAccessibilityImagesMode] = useState<AccessibilityImagesMode>(getStoredAccImages)
   const location = useLocation()
 
   useEffect(() => {
@@ -73,12 +107,37 @@ export default function Layout() {
       if (accessibilityMode) {
         localStorage.setItem(STORAGE_KEY, '1')
         document.documentElement.classList.add('accessibility-mode')
+        document.documentElement.style.setProperty('--accessibility-font-scale', String(accessibilityFontSizePt / DEFAULT_FONT_PT))
+        document.documentElement.classList.remove('accessibility-scheme-default', 'accessibility-scheme-inverted', 'accessibility-scheme-blue', 'accessibility-scheme-yellow', 'accessibility-scheme-brown')
+        document.documentElement.classList.add(`accessibility-scheme-${accessibilityColorScheme}`)
+        document.documentElement.classList.remove('accessibility-images-off', 'accessibility-images-grayscale')
+        if (accessibilityImagesMode !== 'on') document.documentElement.classList.add(accessibilityImagesMode === 'off' ? 'accessibility-images-off' : 'accessibility-images-grayscale')
       } else {
         localStorage.removeItem(STORAGE_KEY)
         document.documentElement.classList.remove('accessibility-mode')
+        document.documentElement.style.removeProperty('--accessibility-font-scale')
+        document.documentElement.classList.remove('accessibility-scheme-default', 'accessibility-scheme-inverted', 'accessibility-scheme-blue', 'accessibility-scheme-yellow', 'accessibility-scheme-brown', 'accessibility-images-off', 'accessibility-images-grayscale')
       }
     } catch { }
-  }, [accessibilityMode])
+  }, [accessibilityMode, accessibilityFontSizePt, accessibilityColorScheme, accessibilityImagesMode])
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(ACC_FONT_KEY, String(accessibilityFontSizePt))
+    } catch { }
+  }, [accessibilityFontSizePt])
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(ACC_SCHEME_KEY, accessibilityColorScheme)
+    } catch { }
+  }, [accessibilityColorScheme])
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(ACC_IMAGES_KEY, accessibilityImagesMode)
+    } catch { }
+  }, [accessibilityImagesMode])
 
   useEffect(() => {
     try {
@@ -97,12 +156,6 @@ export default function Layout() {
     document.title = title
   }, [location.pathname])
 
-  useEffect(() => {
-    fetch('/api/content/sections')
-      .then((res) => (res.ok ? res.json() : Promise.reject()))
-      .then((list: Section[]) => setSections(list.filter((s) => s.id !== 'home' && s.id !== 'cabinet')))
-      .catch(() => setSections(FALLBACK_SECTIONS))
-  }, [])
 
   useEffect(() => {
     const handler = () => setSidebarOpen(true)
@@ -116,7 +169,7 @@ export default function Layout() {
     location.pathname === s.path || (s.path === '/' && location.pathname === '/')
 
   return (
-    <div className={`layout ${sidebarOpen ? 'sidebar-open' : ''}`}>
+    <div className={`layout ${sidebarOpen ? 'sidebar-open' : ''} ${accessibilityMode ? 'has-accessibility-toolbar' : ''}`}>
       <button
         type="button"
         className="menu-toggle"
@@ -140,7 +193,7 @@ export default function Layout() {
           </button>
         </div>
         <ul className="sidebar-menu">
-          {sections.map((s) => (
+          {sections.filter((s) => s.id !== 'home' && s.id !== 'cabinet').map((s) => (
             <li key={s.id}>
               <Link
                 to={s.path}
@@ -164,6 +217,17 @@ export default function Layout() {
           </button>
         </div>
       </aside>
+
+      {accessibilityMode && (
+        <AccessibilityToolbar
+          fontSizePt={accessibilityFontSizePt}
+          onFontSizeChange={setAccessibilityFontSizePt}
+          colorScheme={accessibilityColorScheme}
+          onColorSchemeChange={setAccessibilityColorScheme}
+          imagesMode={accessibilityImagesMode}
+          onImagesModeChange={setAccessibilityImagesMode}
+        />
+      )}
 
       <header className="header">
         <div className="nav-container">

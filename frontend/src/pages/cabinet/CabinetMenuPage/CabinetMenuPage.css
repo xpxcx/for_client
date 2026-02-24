@@ -1,0 +1,10 @@
+.cabinet-menu-list .cabinet-menu-item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.cabinet-menu-list .cabinet-list-meta {
+  font-size: 0.875rem;
+  color: #666;
+}

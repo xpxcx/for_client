@@ -5,6 +5,7 @@ import { useParams, useLocation, Link } from 'react-router-dom'
 import PageNavButtons from '../../components/PageNavButtons'
 import Pagination, { PAGE_SIZE } from '../../components/Pagination'
 import { fetchLinks, linksKeys } from '../../api/links'
+import { menuKeys, fetchSections, fetchSectionItems, sectionItemsKeys } from '../../api/menu'
 import './ContentPage.css'
 
 const API = '/api/content'
@@ -82,14 +83,6 @@ function renderAboutListItem(item: string): ReactElement {
   return <span className="about-body-text">{item}</span>
 }
 
-const MENU_LINKS = [
-  { path: '/achievements', title: 'Достижения' },
-  { path: '/materials', title: 'Материалы' },
-  { path: '/news', title: 'Новости' },
-  { path: '/contact', title: 'Контакты' },
-  { path: '/links', title: 'Полезные ссылки' },
-]
-
 interface Content {
   id: string
   title: string
@@ -133,12 +126,81 @@ export default function ContentPage() {
     enabled: id === 'links',
   })
 
+  const { data: sections = [] } = useQuery({
+    queryKey: menuKeys.list(),
+    queryFn: fetchSections,
+  })
+
+  const pathNorm = (location.pathname || '/').replace(/\/$/, '') || '/'
+  const sectionByPath = sections.find((s) => (s.path.replace(/\/$/, '') || '/') === pathNorm)
+
+  const { data: sectionItems = [] } = useQuery({
+    queryKey: sectionItemsKeys.list(sectionByPath?.id ?? ''),
+    queryFn: () => fetchSectionItems(sectionByPath!.id),
+    enabled: !!sectionByPath?.id && !content,
+  })
+
   if (loading) return <section className="page"><div className="card"><p>Загрузка...</p></div></section>
-  if (error || !content) return <section className="page"><div className="card"><p className="error">{error}</p></div></section>
+  if (error || !content) {
+    if (sectionByPath) {
+      return (
+        <section className="page content-page">
+          <h1>{sectionByPath.title}</h1>
+          {sectionByPath.description && (
+            <p className="content-page-intro">{sectionByPath.description}</p>
+          )}
+          {sectionItems.length > 0 && (
+            <div className="content-section-items materials-list">
+              {sectionItems.map((item) => (
+                <article key={item.id} className="card material-card">
+                  <div className="material-info-item">
+                    <span className="material-info-label">Название</span>
+                    <span className="material-info-value material-info-title">{item.title}</span>
+                  </div>
+                  {item.description && (
+                    <div className="material-info-item">
+                      <span className="material-info-label">Описание</span>
+                      <p className="material-info-desc">{item.description}</p>
+                    </div>
+                  )}
+                  {item.link && (
+                    <div className="material-info-item">
+                      <span className="material-info-label">Ссылка</span>
+                      <a href={item.link} target="_blank" rel="noreferrer" className="material-info-link">
+                        Открыть
+                      </a>
+                    </div>
+                  )}
+                </article>
+              ))}
+            </div>
+          )}
+          <PageNavButtons />
+        </section>
+      )
+    }
+    return <section className="page"><div className="card"><p className="error">{error}</p></div></section>
+  }
 
   if (id === 'about') {
     return (
       <section className="page content-page about-block">
+        <nav className="about-block-nav">
+          {sections
+            .filter((s) => s.id !== 'home' && s.id !== 'cabinet' && s.id !== 'about')
+            .map((s) => (
+              <Link key={s.id} to={s.path} className="about-block-nav-link">
+                {s.title}
+              </Link>
+            ))}
+          <button
+            type="button"
+            className="about-block-nav-link"
+            onClick={() => window.dispatchEvent(new CustomEvent('openSidebar'))}
+          >
+            Меню
+          </button>
+        </nav>
         <h1 className="about-block-title">{content.title}</h1>
         <div className="about-block-inner card">
           <div className="about-photo">
@@ -265,13 +327,6 @@ export default function ContentPage() {
             </div>
           </div>
         </div>
-        <nav className="about-block-nav">
-          {MENU_LINKS.map((item) => (
-            <Link key={item.path} to={item.path} className="about-block-nav-link">
-              {item.title}
-            </Link>
-          ))}
-        </nav>
       </section>
     )
   }
@@ -280,9 +335,7 @@ export default function ContentPage() {
     return (
       <section className="page content-page links-page">
         <h1>{content.title}</h1>
-        <div className="card">
-          <p>{content.body}</p>
-        </div>
+        {content.body && <p className="content-page-intro">{content.body}</p>}
         {linksLoading && <div className="card"><p>Загрузка ссылок...</p></div>}
         {linksError && (
           <div className="card">
@@ -317,9 +370,7 @@ export default function ContentPage() {
   return (
     <section className="page content-page">
       <h1>{content.title}</h1>
-      <div className="card">
-        <p>{content.body}</p>
-      </div>
+      {content.body && <p className="content-page-intro">{content.body}</p>}
       <PageNavButtons />
     </section>
   )

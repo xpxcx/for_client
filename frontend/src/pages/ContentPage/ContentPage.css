@@ -2,6 +2,13 @@
   margin-bottom: 1rem;
 }
 
+.content-page-intro {
+  margin: 0 0 1.5rem;
+  color: #555;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
 .links-list {
   list-style: none;
   margin: 1.5rem 0 0;

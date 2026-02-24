@@ -685,6 +685,11 @@ html.dark-theme .auth-card {
   border-color: #334155;
 }
 
+html.dark-theme .accessibility-toolbar {
+  background: #000;
+  border-bottom-color: #334155;
+}
+
 html.dark-theme .header {
   background: #000;
   border-bottom: 1px solid #334155;

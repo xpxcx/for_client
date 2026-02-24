@@ -12,6 +12,7 @@ const uploadsDirs = [
   join(process.cwd(), 'uploads', 'achievements'),
   join(process.cwd(), 'uploads', 'profile'),
   join(process.cwd(), 'uploads', 'materials'),
+  join(process.cwd(), 'uploads', 'section-files'),
 ];
 uploadsDirs.forEach((dir) => {
   if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
