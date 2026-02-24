@@ -165,7 +165,7 @@ export default function ContentPage() {
                   )}
                   {item.link && (
                     <div className="material-info-item">
-                      <span className="material-info-label">Ссылка</span>
+                      <span className="material-info-label">Материал</span>
                       <a href={item.link} target="_blank" rel="noreferrer" className="material-info-link">
                         Открыть
                       </a>

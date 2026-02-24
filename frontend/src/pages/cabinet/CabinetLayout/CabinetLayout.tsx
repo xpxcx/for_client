@@ -27,7 +27,7 @@ export default function CabinetLayout() {
   const { data: sections = [] } = useQuery({ queryKey: menuKeys.list(), queryFn: fetchSections })
 
   const sectionNavItems = sections
-    .filter((s) => s.id !== 'home' && s.id !== 'cabinet')
+    .filter((s) => s.id !== 'home' && s.id !== 'cabinet' && s.id !== 'contact')
     .map((s) => ({ path: getCabinetPath(s), label: `Управление «${s.title}»`, adminOnly: true }))
 
   const navItems = [

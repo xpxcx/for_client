@@ -140,7 +140,7 @@ export default function CabinetMenuPage() {
     <>
       <h2>Управление меню</h2>
       <p className="cabinet-hint">
-        Добавляйте, редактируйте и удаляйте пункты меню сайта. Укажите название и путь (URL), например /materials или /achievements.
+        Добавляйте, редактируйте и удаляйте пункты меню сайта.
       </p>
       {showAdd && (
         <div className="card cabinet-form-card">
