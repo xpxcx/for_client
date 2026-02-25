@@ -1,4 +1,7 @@
+import { useEffect, useRef } from 'react'
 import './AccessibilityToolbar.css'
+
+const CSS_VAR_TOOLBAR_HEIGHT = '--accessibility-toolbar-height'
 
 const FONT_STEP = 2
 const MIN_PT = 12
@@ -32,6 +35,23 @@ export default function AccessibilityToolbar({
   imagesMode,
   onImagesModeChange,
 }: AccessibilityToolbarProps) {
+  const toolbarRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const el = toolbarRef.current
+    if (!el) return
+    const setHeight = () => {
+      document.documentElement.style.setProperty(CSS_VAR_TOOLBAR_HEIGHT, `${el.offsetHeight}px`)
+    }
+    setHeight()
+    const ro = new ResizeObserver(setHeight)
+    ro.observe(el)
+    return () => {
+      ro.disconnect()
+      document.documentElement.style.removeProperty(CSS_VAR_TOOLBAR_HEIGHT)
+    }
+  }, [])
+
   const decreaseFont = () => onFontSizeChange(Math.max(MIN_PT, fontSizePt - FONT_STEP))
   const increaseFont = () => onFontSizeChange(Math.min(MAX_PT, fontSizePt + FONT_STEP))
 
@@ -40,7 +60,7 @@ export default function AccessibilityToolbar({
   }
 
   return (
-    <div className="accessibility-toolbar" role="toolbar" aria-label="Настройки для слабовидящих">
+    <div ref={toolbarRef} className="accessibility-toolbar" role="toolbar" aria-label="Настройки для слабовидящих">
       <div className="accessibility-toolbar-inner">
         <section className="accessibility-toolbar-section" aria-label="Размер шрифта">
           <span className="accessibility-toolbar-label">Размер шрифта</span>

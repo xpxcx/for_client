@@ -42,7 +42,7 @@ export default function CabinetLayout() {
       <nav className="cabinet-nav">
         <ul className="cabinet-nav-list">
           {navItems
-            .filter((item) => (item.path === '/cabinet/profile' ? !admin : true) && (!item.adminOnly || admin))
+            .filter((item, index) => (index === 0 ? !admin : true) && (!item.adminOnly || admin))
             .map((item) => (
               <li key={item.path}>
                 <Link

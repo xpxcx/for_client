@@ -168,16 +168,20 @@ export default function Layout() {
   const isActive = (s: Section) =>
     location.pathname === s.path || (s.path === '/' && location.pathname === '/')
 
+  const menuToggleBtn = (
+    <button
+      type="button"
+      className="menu-toggle"
+      onClick={() => setSidebarOpen((v) => !v)}
+      aria-label={sidebarOpen ? 'Закрыть меню' : 'Открыть меню'}
+    >
+      ☰
+    </button>
+  )
+
   return (
     <div className={`layout ${sidebarOpen ? 'sidebar-open' : ''} ${accessibilityMode ? 'has-accessibility-toolbar' : ''}`}>
-      <button
-        type="button"
-        className="menu-toggle"
-        onClick={() => setSidebarOpen((v) => !v)}
-        aria-label={sidebarOpen ? 'Закрыть меню' : 'Открыть меню'}
-      >
-        ☰
-      </button>
+      {!accessibilityMode && menuToggleBtn}
 
       <div
         className={`overlay ${sidebarOpen ? 'active' : ''}`}
@@ -231,6 +235,7 @@ export default function Layout() {
 
       <header className="header">
         <div className="nav-container">
+          {accessibilityMode && menuToggleBtn}
           <Link to="/" className="logo">
             Сайт Крумовой Э.М.
           </Link>

@@ -14,7 +14,7 @@ const ABOUT_SECTION_HEADERS = /(Личные качества:|Професси�
 
 function renderAboutBody(body: string): ReactElement {
   const raw = (body ?? '').trim()
-  if (!raw) return <p className="about-body-text" />
+  if (!raw) return <p className="about-body-text about-body-empty">Информация в разделе «О себе» пока не добавлена.</p>
 
   let structured: { title: string; description: string }[] | null = null
   try {
@@ -362,6 +362,11 @@ export default function ContentPage() {
             </>
           )
         })()}
+        {!linksLoading && !linksError && linksList.length === 0 && (
+          <div className="card links-empty">
+            <p>Ссылок пока нет.</p>
+          </div>
+        )}
         <PageNavButtons />
       </section>
     )
