@@ -1,6 +1,14 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { readFileSync, writeFileSync, mkdirSync, unlinkSync, existsSync } from 'fs';
 import { join, dirname } from 'path';
+import { AboutProfile } from './entities/about-profile.entity';
+import { AboutEducation } from './entities/about-education.entity';
+import { AboutExperience } from './entities/about-experience.entity';
+import { AboutBody } from './entities/about-body.entity';
+import { MenuSection } from './entities/menu-section.entity';
+import { SectionItemEntity } from './entities/section-item.entity';
 
 export interface Section {
   id: string;
@@ -28,8 +36,6 @@ export interface SectionContent {
 }
 
 const CONTENT_FILE = join(process.cwd(), 'data', 'content.json');
-const MENU_FILE = join(process.cwd(), 'data', 'menu.json');
-const SECTION_CONTENT_FILE = join(process.cwd(), 'data', 'section-content.json');
 const PROFILE_UPLOAD_DIR = 'profile';
 const SECTION_FILES_UPLOAD_DIR = 'section-files';
 
@@ -68,8 +74,14 @@ function deleteSectionFileByUrl(url: string | null | undefined): void {
 
 @Injectable()
 export class ContentService implements OnModuleInit {
-  private sections: Section[] = [...DEFAULT_SECTIONS];
-  private sectionItems: Record<string, SectionItem[]> = {};
+  constructor(
+    @InjectRepository(AboutProfile) private readonly aboutProfileRepo: Repository<AboutProfile>,
+    @InjectRepository(AboutEducation) private readonly aboutEducationRepo: Repository<AboutEducation>,
+    @InjectRepository(AboutExperience) private readonly aboutExperienceRepo: Repository<AboutExperience>,
+    @InjectRepository(AboutBody) private readonly aboutBodyRepo: Repository<AboutBody>,
+    @InjectRepository(MenuSection) private readonly menuSectionRepo: Repository<MenuSection>,
+    @InjectRepository(SectionItemEntity) private readonly sectionItemRepo: Repository<SectionItemEntity>,
+  ) {}
 
   private readonly content: Record<string, SectionContent> = {
     home: {
@@ -114,84 +126,210 @@ export class ContentService implements OnModuleInit {
     },
   };
 
-  onModuleInit() {
+  async onModuleInit() {
     try {
       const data = readFileSync(CONTENT_FILE, 'utf-8');
       const loaded = JSON.parse(data) as Record<string, SectionContent>;
       for (const id of Object.keys(loaded)) {
+        if (id === 'about') continue;
         if (this.content[id] && loaded[id]) {
           Object.assign(this.content[id], loaded[id]);
         }
       }
     } catch {
-      // файла нет или ошибка — используем значения по умолчанию
-    }
-    try {
-      const menuData = readFileSync(MENU_FILE, 'utf-8');
-      const arr = JSON.parse(menuData) as Section[];
-      if (Array.isArray(arr) && arr.length > 0) {
-        this.sections = arr.filter((s) => s && typeof s.id === 'string' && typeof s.title === 'string' && typeof s.path === 'string');
-        if (this.sections.length === 0) this.sections = [...DEFAULT_SECTIONS];
-      }
-    } catch {
-      // файла нет — sections уже по умолчанию
-    }
-    try {
-      const sectionData = readFileSync(SECTION_CONTENT_FILE, 'utf-8');
-      const loaded = JSON.parse(sectionData) as Record<string, SectionItem[]>;
-      if (loaded && typeof loaded === 'object') {
-        this.sectionItems = loaded;
-      }
-    } catch {
       //
+    }
+    await this.ensureAboutProfile();
+    await this.ensureMenuSections();
+  }
+
+  private async ensureMenuSections() {
+    const count = await this.menuSectionRepo.count();
+    if (count === 0) {
+      for (let i = 0; i < DEFAULT_SECTIONS.length; i++) {
+        const s = DEFAULT_SECTIONS[i];
+        await this.menuSectionRepo.save(
+          this.menuSectionRepo.create({
+            id: s.id,
+            title: s.title,
+            path: s.path,
+            description: s.description ?? null,
+            sortOrder: i,
+          }),
+        );
+      }
     }
   }
 
-  private saveSectionItems() {
-    try {
-      mkdirSync(dirname(SECTION_CONTENT_FILE), { recursive: true });
-      writeFileSync(SECTION_CONTENT_FILE, JSON.stringify(this.sectionItems, null, 2), 'utf-8');
-    } catch {
-      //
+  private async ensureAboutProfile() {
+    const count = await this.aboutProfileRepo.count();
+    if (count === 0) {
+      const profile = this.aboutProfileRepo.create({
+        pageTitle: 'Раздел о себе',
+        fullName: null,
+        birthDate: null,
+        imageUrl: null,
+      });
+      await this.aboutProfileRepo.save(profile);
     }
   }
 
-  private saveMenu() {
-    try {
-      mkdirSync(dirname(MENU_FILE), { recursive: true });
-      writeFileSync(MENU_FILE, JSON.stringify(this.sections, null, 2), 'utf-8');
-    } catch {
-      // ignore
+  private async getAboutFromDb(): Promise<SectionContent | null> {
+    const [profile] = await this.aboutProfileRepo.find({ order: { id: 'ASC' }, take: 1 });
+    if (!profile) return null;
+    const educationRows = await this.aboutEducationRepo.find({ order: { sortOrder: 'ASC' } });
+    const experienceRows = await this.aboutExperienceRepo.find({ order: { sortOrder: 'ASC' } });
+    const bodyRows = await this.aboutBodyRepo.find({ order: { sortOrder: 'ASC' } });
+    const education = JSON.stringify(
+      educationRows.map((e) => ({ institution: e.institution, document: e.document, qualification: e.qualification })),
+    );
+    const experience = JSON.stringify(
+      experienceRows.map((e) => ({ placeOfWork: e.placeOfWork, position: e.position, period: e.period })),
+    );
+    const body = JSON.stringify(bodyRows.map((b) => ({ title: b.title, description: b.description })));
+    return {
+      id: 'about',
+      title: profile.pageTitle,
+      body,
+      fullName: profile.fullName ?? undefined,
+      birthDate: profile.birthDate ?? undefined,
+      imageUrl: profile.imageUrl ?? undefined,
+      education,
+      experience,
+    };
+  }
+
+  private async updateAboutInDb(dto: {
+    title?: string;
+    body?: string;
+    fullName?: string;
+    birthDate?: string;
+    imageUrl?: string;
+    education?: string;
+    experience?: string;
+  }): Promise<SectionContent | null> {
+    const [profile] = await this.aboutProfileRepo.find({ order: { id: 'ASC' }, take: 1 });
+    if (!profile) return null;
+    if (dto.imageUrl !== undefined && profile.imageUrl && (profile.imageUrl !== dto.imageUrl || dto.imageUrl === '' || dto.imageUrl === null)) {
+      deleteProfilePhotoByUrl(profile.imageUrl);
     }
+    if (dto.title !== undefined) profile.pageTitle = dto.title;
+    if (dto.fullName !== undefined) profile.fullName = dto.fullName;
+    if (dto.birthDate !== undefined) profile.birthDate = dto.birthDate;
+    if (dto.imageUrl !== undefined) profile.imageUrl = dto.imageUrl ?? null;
+    await this.aboutProfileRepo.save(profile);
+
+    if (dto.education !== undefined) {
+      await this.aboutEducationRepo.delete({});
+      const arr = (() => {
+        try {
+          const parsed = JSON.parse(dto.education);
+          return Array.isArray(parsed) ? parsed : [];
+        } catch {
+          return [];
+        }
+      })();
+      for (let i = 0; i < arr.length; i++) {
+        const o = arr[i];
+        const e = this.aboutEducationRepo.create({
+          sortOrder: i,
+          institution: o?.institution ?? '',
+          document: o?.document ?? '',
+          qualification: o?.qualification ?? '',
+        });
+        await this.aboutEducationRepo.save(e);
+      }
+    }
+    if (dto.experience !== undefined) {
+      await this.aboutExperienceRepo.delete({});
+      const arr = (() => {
+        try {
+          const parsed = JSON.parse(dto.experience);
+          return Array.isArray(parsed) ? parsed : [];
+        } catch {
+          return [];
+        }
+      })();
+      for (let i = 0; i < arr.length; i++) {
+        const o = arr[i];
+        const e = this.aboutExperienceRepo.create({
+          sortOrder: i,
+          placeOfWork: o?.placeOfWork ?? '',
+          position: o?.position ?? '',
+          period: o?.period ?? '',
+        });
+        await this.aboutExperienceRepo.save(e);
+      }
+    }
+    if (dto.body !== undefined) {
+      await this.aboutBodyRepo.delete({});
+      const arr = (() => {
+        try {
+          const parsed = JSON.parse(dto.body);
+          return Array.isArray(parsed) ? parsed : [];
+        } catch {
+          return [];
+        }
+      })();
+      for (let i = 0; i < arr.length; i++) {
+        const o = arr[i];
+        const b = this.aboutBodyRepo.create({
+          sortOrder: i,
+          title: o?.title ?? '',
+          description: o?.description ?? '',
+        });
+        await this.aboutBodyRepo.save(b);
+      }
+    }
+    return this.getAboutFromDb();
   }
 
   private static readonly NON_DELETABLE_SECTION_IDS = new Set(['about', 'achievements', 'materials', 'news', 'contact']);
 
-  setSections(sections: Section[]) {
+  async getSections(): Promise<Section[]> {
+    const rows = await this.menuSectionRepo.find({ order: { sortOrder: 'ASC' } });
+    return rows.map((r) => ({
+      id: r.id,
+      title: r.title,
+      path: r.path,
+      description: r.description ?? undefined,
+    }));
+  }
+
+  async setSections(sections: Section[]): Promise<Section[]> {
     const valid = sections.filter((s) => s && typeof s.id === 'string' && typeof s.title === 'string' && typeof s.path === 'string' && String(s.path).startsWith('/'));
     const fromClient = valid.length > 0 ? valid : [];
+    const currentRows = await this.menuSectionRepo.find({ order: { sortOrder: 'ASC' } });
     const clientById = new Map(fromClient.map((s) => [s.id, s]));
     const result: Section[] = [];
-    for (const s of this.sections) {
-      if (ContentService.NON_DELETABLE_SECTION_IDS.has(s.id)) {
-        result.push(s);
-      } else if (clientById.has(s.id)) {
-        result.push(clientById.get(s.id)!);
+    for (const row of currentRows) {
+      if (ContentService.NON_DELETABLE_SECTION_IDS.has(row.id)) {
+        result.push({ id: row.id, title: row.title, path: row.path, description: row.description ?? undefined });
+      } else if (clientById.has(row.id)) {
+        result.push(clientById.get(row.id)!);
       } else {
-        const items = this.sectionItems[s.id];
-        if (Array.isArray(items)) {
-          for (const item of items) deleteSectionFileByUrl(item.link);
-          delete this.sectionItems[s.id];
-        }
+        const items = await this.sectionItemRepo.find({ where: { sectionId: row.id } });
+        for (const item of items) deleteSectionFileByUrl(item.link);
+        await this.sectionItemRepo.delete({ sectionId: row.id });
       }
     }
     for (const s of fromClient) {
       if (!result.some((r) => r.id === s.id)) result.push(s);
     }
-    this.sections = result.length > 0 ? result : [...DEFAULT_SECTIONS];
-    this.saveMenu();
-    this.saveSectionItems();
-    return this.sections;
+    const final = result.length > 0 ? result : [...DEFAULT_SECTIONS];
+    await this.menuSectionRepo.clear();
+    for (let i = 0; i < final.length; i++) {
+      await this.menuSectionRepo.save(
+        this.menuSectionRepo.create({
+          id: final[i].id,
+          title: final[i].title,
+          path: final[i].path,
+          description: final[i].description ?? null,
+          sortOrder: i,
+        }),
+      );
+    }
+    return final;
   }
 
   private saveToFile() {
@@ -203,67 +341,64 @@ export class ContentService implements OnModuleInit {
     }
   }
 
-  getSections(): Section[] {
-    return this.sections;
+  async getSectionItems(sectionId: string): Promise<SectionItem[]> {
+    const rows = await this.sectionItemRepo.find({ where: { sectionId }, order: { sortOrder: 'ASC' } });
+    return rows.map((r) => ({
+      id: r.id,
+      title: r.title,
+      description: r.description ?? undefined,
+      link: r.link ?? undefined,
+    }));
   }
 
-  getSectionItems(sectionId: string): SectionItem[] {
-    const list = this.sectionItems[sectionId];
-    return Array.isArray(list) ? [...list] : [];
-  }
-
-  addSectionItem(sectionId: string, dto: { title: string; description?: string; link?: string }): SectionItem | null {
+  async addSectionItem(sectionId: string, dto: { title: string; description?: string; link?: string }): Promise<SectionItem | null> {
     if (!sectionId || !dto?.title || typeof dto.title !== 'string') return null;
-    const list = this.sectionItems[sectionId] ?? [];
     const id = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
-    const item: SectionItem = {
+    const count = await this.sectionItemRepo.count({ where: { sectionId } });
+    const entity = this.sectionItemRepo.create({
       id,
+      sectionId,
       title: dto.title.trim(),
-      description: dto.description != null ? String(dto.description).trim() : undefined,
-      link: dto.link != null ? String(dto.link).trim() : undefined,
-    };
-    this.sectionItems[sectionId] = [...list, item];
-    this.saveSectionItems();
-    return item;
+      description: dto.description != null ? String(dto.description).trim() : null,
+      link: dto.link != null ? String(dto.link).trim() : null,
+      sortOrder: count,
+    });
+    await this.sectionItemRepo.save(entity);
+    return { id, title: entity.title, description: entity.description ?? undefined, link: entity.link ?? undefined };
   }
 
-  updateSectionItem(sectionId: string, itemId: string, dto: { title?: string; description?: string; link?: string }): SectionItem | null {
-    const list = this.sectionItems[sectionId];
-    if (!Array.isArray(list)) return null;
-    const idx = list.findIndex((i) => i.id === itemId);
-    if (idx < 0) return null;
-    const item = { ...list[idx] };
-    if (dto.title !== undefined) item.title = dto.title.trim();
-    if (dto.description !== undefined) item.description = dto.description ? String(dto.description).trim() : undefined;
+  async updateSectionItem(sectionId: string, itemId: string, dto: { title?: string; description?: string; link?: string }): Promise<SectionItem | null> {
+    const entity = await this.sectionItemRepo.findOne({ where: { id: itemId, sectionId } });
+    if (!entity) return null;
+    if (dto.title !== undefined) entity.title = dto.title.trim();
+    if (dto.description !== undefined) entity.description = dto.description ? String(dto.description).trim() : null;
     if (dto.link !== undefined) {
-      const oldLink = item.link;
-      item.link = dto.link ? String(dto.link).trim() : undefined;
-      if (oldLink && (oldLink !== item.link || !item.link)) deleteSectionFileByUrl(oldLink);
+      const oldLink = entity.link;
+      entity.link = dto.link ? String(dto.link).trim() : null;
+      if (oldLink && (oldLink !== entity.link || !entity.link)) deleteSectionFileByUrl(oldLink);
     }
-    list[idx] = item;
-    this.saveSectionItems();
-    return item;
+    await this.sectionItemRepo.save(entity);
+    return { id: entity.id, title: entity.title, description: entity.description ?? undefined, link: entity.link ?? undefined };
   }
 
-  deleteSectionItem(sectionId: string, itemId: string): boolean {
-    const list = this.sectionItems[sectionId];
-    if (!Array.isArray(list)) return false;
-    const found = list.find((i) => i.id === itemId);
-    if (!found) return false;
-    deleteSectionFileByUrl(found.link);
-    this.sectionItems[sectionId] = list.filter((i) => i.id !== itemId);
-    this.saveSectionItems();
+  async deleteSectionItem(sectionId: string, itemId: string): Promise<boolean> {
+    const entity = await this.sectionItemRepo.findOne({ where: { id: itemId, sectionId } });
+    if (!entity) return false;
+    deleteSectionFileByUrl(entity.link);
+    await this.sectionItemRepo.delete({ id: itemId });
     return true;
   }
 
-  getContent(id: string): SectionContent | null {
+  async getContent(id: string): Promise<SectionContent | null> {
+    if (id === 'about') return this.getAboutFromDb();
     return this.content[id] ?? null;
   }
 
-  updateContent(
+  async updateContent(
     id: string,
     dto: { title?: string; body?: string; fullName?: string; birthDate?: string; imageUrl?: string; education?: string; experience?: string },
-  ): SectionContent | null {
+  ): Promise<SectionContent | null> {
+    if (id === 'about') return this.updateAboutInDb(dto);
     const item = this.content[id];
     if (!item) return null;
     if (dto.imageUrl !== undefined && item.imageUrl && (item.imageUrl !== dto.imageUrl || dto.imageUrl === '' || dto.imageUrl === null)) {

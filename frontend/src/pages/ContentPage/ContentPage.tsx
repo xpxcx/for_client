@@ -149,7 +149,7 @@ export default function ContentPage() {
           {sectionByPath.description && (
             <p className="content-page-intro">{sectionByPath.description}</p>
           )}
-          {sectionItems.length > 0 && (
+          {sectionItems.length > 0 ? (
             <div className="content-section-items materials-list">
               {sectionItems.map((item) => (
                 <article key={item.id} className="card material-card">
@@ -173,6 +173,10 @@ export default function ContentPage() {
                   )}
                 </article>
               ))}
+            </div>
+          ) : (
+            <div className="content-section-empty card">
+              <p className="content-section-empty-text">В разделе «{sectionByPath.title}» пока ничего нет.</p>
             </div>
           )}
           <PageNavButtons />

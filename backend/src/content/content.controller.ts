@@ -74,56 +74,56 @@ export class ContentController {
   }
 
   @Get('sections')
-  getSections() {
+  async getSections() {
     return this.contentService.getSections();
   }
 
   @Put('sections')
   @UseGuards(JwtAuthGuard, AdminGuard)
-  setSections(@Body() body: { sections: Section[] }) {
+  async setSections(@Body() body: { sections: Section[] }) {
     const sections = Array.isArray(body?.sections) ? body.sections : [];
     return this.contentService.setSections(sections);
   }
 
   @Get('section/:sectionId/items')
-  getSectionItems(@Param('sectionId') sectionId: string) {
+  async getSectionItems(@Param('sectionId') sectionId: string) {
     return this.contentService.getSectionItems(sectionId);
   }
 
   @Post('section/:sectionId/items')
   @UseGuards(JwtAuthGuard, AdminGuard)
-  addSectionItem(
+  async addSectionItem(
     @Param('sectionId') sectionId: string,
     @Body() body: { title: string; description?: string; link?: string },
   ) {
-    const item = this.contentService.addSectionItem(sectionId, body);
+    const item = await this.contentService.addSectionItem(sectionId, body);
     if (!item) throw new BadRequestException('Неверные данные');
     return item;
   }
 
   @Patch('section/:sectionId/items/:itemId')
   @UseGuards(JwtAuthGuard, AdminGuard)
-  updateSectionItem(
+  async updateSectionItem(
     @Param('sectionId') sectionId: string,
     @Param('itemId') itemId: string,
     @Body() body: { title?: string; description?: string; link?: string },
   ) {
-    const item = this.contentService.updateSectionItem(sectionId, itemId, body);
+    const item = await this.contentService.updateSectionItem(sectionId, itemId, body);
     if (!item) throw new BadRequestException('Не найден');
     return item;
   }
 
   @Delete('section/:sectionId/items/:itemId')
   @UseGuards(JwtAuthGuard, AdminGuard)
-  deleteSectionItem(@Param('sectionId') sectionId: string, @Param('itemId') itemId: string) {
-    const ok = this.contentService.deleteSectionItem(sectionId, itemId);
+  async deleteSectionItem(@Param('sectionId') sectionId: string, @Param('itemId') itemId: string) {
+    const ok = await this.contentService.deleteSectionItem(sectionId, itemId);
     if (!ok) throw new BadRequestException('Не найден');
     return { ok: true };
   }
 
   @Get(':id')
-  getContent(@Param('id') id: string) {
-    const content = this.contentService.getContent(id);
+  async getContent(@Param('id') id: string) {
+    const content = await this.contentService.getContent(id);
     if (!content) {
       return { error: 'Not found' };
     }
@@ -131,11 +131,11 @@ export class ContentController {
   }
 
   @Patch(':id')
-  updateContent(
+  async updateContent(
     @Param('id') id: string,
     @Body() body: { title?: string; body?: string; fullName?: string; birthDate?: string; imageUrl?: string; education?: string; experience?: string },
   ) {
-    const updated = this.contentService.updateContent(id, body);
+    const updated = await this.contentService.updateContent(id, body);
     if (!updated) {
       return { error: 'Not found' };
     }

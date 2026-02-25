@@ -30,7 +30,7 @@
 
 .accessibility-mode .page h3 {
   font-size: calc(1.35rem * var(--accessibility-font-scale, 1));
-  color: #111;
+  color: #000;
   font-weight: 600;
 }
 
@@ -53,7 +53,7 @@
 
 .accessibility-mode .contact-form label,
 .accessibility-mode .form-group label {
-  color: #000;
+  color: #000 !important;
   font-weight: 600;
 }
 
@@ -65,7 +65,7 @@
 .accessibility-mode .achievement-info-label,
 .accessibility-mode .achievement-info-value,
 .accessibility-mode .achievement-info-desc {
-  color: #111;
+  color: #000;
 }
 
 .accessibility-mode .news-date,
@@ -84,6 +84,12 @@
 .accessibility-mode .news-item {
   border-left-width: 5px;
   border-left-color: #000;
+}
+
+.accessibility-mode .about-block-nav a,
+.accessibility-mode .about-block-nav .about-block-nav-link,
+.accessibility-mode button.about-block-nav-link {
+  color: #000 !important;
 }
 
 .accessibility-mode .page a,
@@ -162,7 +168,10 @@
 .accessibility-mode.accessibility-scheme-inverted .achievement-info-value,
 .accessibility-mode.accessibility-scheme-inverted .achievement-info-desc,
 .accessibility-mode.accessibility-scheme-inverted .contact-form label,
-.accessibility-mode.accessibility-scheme-inverted .form-group label {
+.accessibility-mode.accessibility-scheme-inverted .form-group label,
+.accessibility-mode.accessibility-scheme-inverted .about-block-nav a,
+.accessibility-mode.accessibility-scheme-inverted .about-block-nav .about-block-nav-link,
+.accessibility-mode.accessibility-scheme-inverted button.about-block-nav-link {
   color: #fff !important;
 }
 
@@ -198,7 +207,6 @@
 .accessibility-mode.accessibility-scheme-blue .page h2,
 .accessibility-mode.accessibility-scheme-blue .card h3,
 .accessibility-mode.accessibility-scheme-blue .page h3,
-.accessibility-mode.accessibility-scheme-blue .about-fio,
 .accessibility-mode.accessibility-scheme-blue .news-date,
 .accessibility-mode.accessibility-scheme-blue .news-title,
 .accessibility-mode.accessibility-scheme-blue .achievement-date,
@@ -210,6 +218,37 @@
 .accessibility-mode.accessibility-scheme-blue .contact-form label,
 .accessibility-mode.accessibility-scheme-blue .form-group label {
   color: #001a3d !important;
+}
+
+.accessibility-mode.accessibility-scheme-blue .about-section {
+  background: #003d82 !important;
+  border-color: #002952 !important;
+}
+
+.accessibility-mode.accessibility-scheme-blue .about-section h3,
+.accessibility-mode.accessibility-scheme-blue .about-section .about-body-label,
+.accessibility-mode.accessibility-scheme-blue .about-section .about-body-text,
+.accessibility-mode.accessibility-scheme-blue .about-section .about-body-intro,
+.accessibility-mode.accessibility-scheme-blue .about-section .about-education-item,
+.accessibility-mode.accessibility-scheme-blue .about-section .about-experience-item {
+  color: #fff !important;
+}
+
+.accessibility-mode.accessibility-scheme-blue .about-block-nav a,
+.accessibility-mode.accessibility-scheme-blue .about-block-nav .about-block-nav-link,
+.accessibility-mode.accessibility-scheme-blue button.about-block-nav-link {
+  color: #000 !important;
+}
+
+.accessibility-mode.accessibility-scheme-blue .about-fio-block {
+  background: #003d82 !important;
+  color: #fff !important;
+  border-color: #002952 !important;
+}
+
+.accessibility-mode.accessibility-scheme-blue .about-fio,
+.accessibility-mode.accessibility-scheme-blue .about-fio-block .about-birth-date {
+  color: #fff !important;
 }
 
 .accessibility-mode.accessibility-scheme-blue .page a,
@@ -254,8 +293,39 @@
 .accessibility-mode.accessibility-scheme-yellow .achievement-info-value,
 .accessibility-mode.accessibility-scheme-yellow .achievement-info-desc,
 .accessibility-mode.accessibility-scheme-yellow .contact-form label,
-.accessibility-mode.accessibility-scheme-yellow .form-group label {
+.accessibility-mode.accessibility-scheme-yellow .form-group label,
+.accessibility-mode.accessibility-scheme-yellow .about-block-nav a,
+.accessibility-mode.accessibility-scheme-yellow .about-block-nav .about-block-nav-link,
+.accessibility-mode.accessibility-scheme-yellow button.about-block-nav-link {
   color: #000 !important;
+}
+
+.accessibility-mode.accessibility-scheme-yellow .about-fio-block {
+  background: #333 !important;
+  border-color: #333 !important;
+  color: #fff !important;
+}
+
+.accessibility-mode.accessibility-scheme-yellow .about-fio-block .about-fio,
+.accessibility-mode.accessibility-scheme-yellow .about-fio-block .about-birth-date,
+.accessibility-mode.accessibility-scheme-yellow .about-fio-block h2,
+.accessibility-mode.accessibility-scheme-yellow .about-fio-block p {
+  color: #fff !important;
+}
+
+.accessibility-mode.accessibility-scheme-yellow .about-section {
+  background: #333 !important;
+  border-color: #444 !important;
+  color: #fff !important;
+}
+
+.accessibility-mode.accessibility-scheme-yellow .about-section h3,
+.accessibility-mode.accessibility-scheme-yellow .about-section .about-body-label,
+.accessibility-mode.accessibility-scheme-yellow .about-section .about-body-text,
+.accessibility-mode.accessibility-scheme-yellow .about-section .about-body-intro,
+.accessibility-mode.accessibility-scheme-yellow .about-section .about-education-item,
+.accessibility-mode.accessibility-scheme-yellow .about-section .about-experience-item {
+  color: #fff !important;
 }
 
 .accessibility-mode.accessibility-scheme-yellow .page a,
@@ -300,7 +370,10 @@
 .accessibility-mode.accessibility-scheme-brown .achievement-info-value,
 .accessibility-mode.accessibility-scheme-brown .achievement-info-desc,
 .accessibility-mode.accessibility-scheme-brown .contact-form label,
-.accessibility-mode.accessibility-scheme-brown .form-group label {
+.accessibility-mode.accessibility-scheme-brown .form-group label,
+.accessibility-mode.accessibility-scheme-brown .about-block-nav a,
+.accessibility-mode.accessibility-scheme-brown .about-block-nav .about-block-nav-link,
+.accessibility-mode.accessibility-scheme-brown button.about-block-nav-link {
   color: #c8e6c9 !important;
 }
 

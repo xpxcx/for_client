@@ -41,8 +41,12 @@
   left: auto;
 }
 
+.layout.has-accessibility-toolbar .menu-toggle {
+  top: calc(var(--accessibility-toolbar-height, 3.25rem) + 1rem);
+}
+
 .layout.has-accessibility-toolbar .nav-container {
-  padding-left: 2rem;
+  padding-left: 4rem;
 }
 
 .overlay {

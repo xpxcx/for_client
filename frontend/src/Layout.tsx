@@ -181,7 +181,7 @@ export default function Layout() {
 
   return (
     <div className={`layout ${sidebarOpen ? 'sidebar-open' : ''} ${accessibilityMode ? 'has-accessibility-toolbar' : ''}`}>
-      {!accessibilityMode && menuToggleBtn}
+      {menuToggleBtn}
 
       <div
         className={`overlay ${sidebarOpen ? 'active' : ''}`}
@@ -235,7 +235,6 @@ export default function Layout() {
 
       <header className="header">
         <div className="nav-container">
-          {accessibilityMode && menuToggleBtn}
           <Link to="/" className="logo">
             Сайт Крумовой Э.М.
           </Link>
