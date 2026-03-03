@@ -284,8 +284,6 @@ export class ContentService implements OnModuleInit {
     return this.getAboutFromDb();
   }
 
-  private static readonly NON_DELETABLE_SECTION_IDS = new Set(['about', 'achievements', 'materials', 'news', 'contact']);
-
   async getSections(): Promise<Section[]> {
     const rows = await this.menuSectionRepo.find({ order: { sortOrder: 'ASC' } });
     return rows.map((r) => ({
@@ -303,9 +301,7 @@ export class ContentService implements OnModuleInit {
     const clientById = new Map(fromClient.map((s) => [s.id, s]));
     const result: Section[] = [];
     for (const row of currentRows) {
-      if (ContentService.NON_DELETABLE_SECTION_IDS.has(row.id)) {
-        result.push({ id: row.id, title: row.title, path: row.path, description: row.description ?? undefined });
-      } else if (clientById.has(row.id)) {
+      if (clientById.has(row.id)) {
         result.push(clientById.get(row.id)!);
       } else {
         const items = await this.sectionItemRepo.find({ where: { sectionId: row.id } });

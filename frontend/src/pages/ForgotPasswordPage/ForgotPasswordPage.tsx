@@ -63,7 +63,6 @@ export default function ForgotPasswordPage() {
       return 0
     }
   })
-  const [sendingAfterTimer, setSendingAfterTimer] = useState(false)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -78,30 +77,21 @@ export default function ForgotPasswordPage() {
   useEffect(() => {
     if (!submittedEmail || cooldownRemaining <= 0) return
     const id = setInterval(() => {
-      setCooldownRemaining((prev) => {
-        if (prev <= 1) {
-          setSendingAfterTimer(true)
-          forgotPassword(submittedEmail)
-            .then(() => {
-              saveCooldownEnd(submittedEmail)
-              try {
-                sessionStorage.removeItem(PENDING_EMAIL_KEY)
-                sessionStorage.removeItem(PENDING_STATE_KEY)
-              } catch { }
-              navigate('/reset-password', { state: { email: submittedEmail } })
-            })
-            .catch(() => {
-              setSendingAfterTimer(false)
-              setError('Не удалось отправить код')
-              setSubmittedEmail(null)
-            })
-          return 0
-        }
-        return prev - 1
-      })
+      const remaining = loadCooldownRemaining(submittedEmail)
+      if (remaining <= 0) {
+        try {
+          sessionStorage.removeItem(PENDING_EMAIL_KEY)
+          sessionStorage.removeItem(PENDING_STATE_KEY)
+        } catch { }
+        setEmail(submittedEmail)
+        setSubmittedEmail(null)
+        setCooldownRemaining(0)
+        return
+      }
+      setCooldownRemaining(remaining)
     }, 1000)
     return () => clearInterval(id)
-  }, [submittedEmail, cooldownRemaining, navigate])
+  }, [submittedEmail, cooldownRemaining])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -132,9 +122,8 @@ export default function ForgotPasswordPage() {
           <div className="card auth-card">
             <p className="muted">Код будет отправлен на {submittedEmail} после истечения таймера.</p>
             <p className="forgot-timer-hint">
-              Отправка кода через <strong>{formatCooldown(cooldownRemaining)}</strong>
+              Повторно отправить код можно через <strong>{formatCooldown(cooldownRemaining)}</strong>
             </p>
-            {sendingAfterTimer && <p className="muted">Отправка...</p>}
             <p style={{ marginTop: '1rem' }}>
               <Link to="/login">Вернуться к входу</Link>
             </p>

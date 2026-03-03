@@ -41,8 +41,6 @@ function slugify(title: string): string {
 
 const emptyForm = { title: '', path: '', description: '' }
 
-const NON_DELETABLE_IDS = new Set(['about', 'achievements', 'materials', 'news', 'contact'])
-
 export default function CabinetMenuPage() {
   const [form, setForm] = useState(emptyForm)
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -111,9 +109,7 @@ export default function CabinetMenuPage() {
     updateMutation.mutate(next)
   }
 
-  const listItems = items.filter(
-    (s) => s.id !== 'home' && s.id !== 'cabinet' && !NON_DELETABLE_IDS.has(s.id)
-  )
+  const listItems = items.filter((s) => s.id !== 'home' && s.id !== 'cabinet')
   const submitting = updateMutation.isPending
   const mutationError = updateMutation.error
 
