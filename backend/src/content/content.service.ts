@@ -220,7 +220,7 @@ export class ContentService implements OnModuleInit {
     await this.aboutProfileRepo.save(profile);
 
     if (dto.education !== undefined) {
-      await this.aboutEducationRepo.delete({});
+      await this.aboutEducationRepo.clear();
       const arr = (() => {
         try {
           const parsed = JSON.parse(dto.education);
@@ -241,7 +241,7 @@ export class ContentService implements OnModuleInit {
       }
     }
     if (dto.experience !== undefined) {
-      await this.aboutExperienceRepo.delete({});
+      await this.aboutExperienceRepo.clear();
       const arr = (() => {
         try {
           const parsed = JSON.parse(dto.experience);
@@ -262,7 +262,7 @@ export class ContentService implements OnModuleInit {
       }
     }
     if (dto.body !== undefined) {
-      await this.aboutBodyRepo.delete({});
+      await this.aboutBodyRepo.clear();
       const arr = (() => {
         try {
           const parsed = JSON.parse(dto.body);
