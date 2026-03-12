@@ -12,6 +12,7 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
+import { SkipThrottle } from '@nestjs/throttler';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { join } from 'path';
@@ -74,6 +75,7 @@ export class ContentController {
   }
 
   @Get('sections')
+  @SkipThrottle()
   async getSections() {
     return this.contentService.getSections();
   }
@@ -86,6 +88,7 @@ export class ContentController {
   }
 
   @Get('section/:sectionId/items')
+  @SkipThrottle()
   async getSectionItems(@Param('sectionId') sectionId: string) {
     return this.contentService.getSectionItems(sectionId);
   }
@@ -122,6 +125,7 @@ export class ContentController {
   }
 
   @Get(':id')
+  @SkipThrottle()
   async getContent(@Param('id') id: string) {
     const content = await this.contentService.getContent(id);
     if (!content) {

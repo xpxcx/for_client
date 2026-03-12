@@ -3,18 +3,10 @@ import { useQuery } from '@tanstack/react-query'
 import { Link, Outlet, useLocation } from 'react-router-dom'
 import CookieNotice from './components/CookieNotice'
 import AccessibilityToolbar, { type AccessibilityColorScheme, type AccessibilityImagesMode } from './components/AccessibilityToolbar/AccessibilityToolbar'
-import { menuKeys, fetchSections, type Section } from './api/menu'
+import { menuKeys, fetchSections, DEFAULT_SECTIONS, type Section } from './api/menu'
 import './Layout.css'
 import './DarkTheme.css'
 
-const FALLBACK_SECTIONS: Section[] = [
-  { id: 'about', title: 'О себе', path: '/' },
-  { id: 'achievements', title: 'Достижения', path: '/achievements' },
-  { id: 'materials', title: 'Материалы', path: '/materials' },
-  { id: 'news', title: 'Новости', path: '/news' },
-  { id: 'contact', title: 'Контакты', path: '/contact' },
-  { id: 'links', title: 'Полезные ссылки', path: '/links' },
-]
 
 const TITLE_PREFIX = 'Крумова Эльмира Мамедовна, Сургут - '
 
@@ -93,8 +85,13 @@ function getStoredAccImages(): AccessibilityImagesMode {
 
 export default function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const { data: sectionsData } = useQuery({ queryKey: menuKeys.list(), queryFn: fetchSections })
-  const sections = sectionsData ?? FALLBACK_SECTIONS
+  const { data: sectionsData } = useQuery({
+    queryKey: menuKeys.list(),
+    queryFn: fetchSections,
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 5000),
+  })
+  const sections = sectionsData ?? DEFAULT_SECTIONS
   const [accessibilityMode, setAccessibilityMode] = useState(() => getStoredAccessibility())
   const [darkTheme, setDarkTheme] = useState(() => getStoredDarkTheme())
   const [accessibilityFontSizePt, setAccessibilityFontSizePt] = useState(getStoredAccFont)

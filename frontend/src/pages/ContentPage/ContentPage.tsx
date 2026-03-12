@@ -5,7 +5,7 @@ import { useParams, useLocation, Link } from 'react-router-dom'
 import PageNavButtons from '../../components/PageNavButtons'
 import Pagination, { PAGE_SIZE } from '../../components/Pagination'
 import { fetchLinks, linksKeys } from '../../api/links'
-import { menuKeys, fetchSections, fetchSectionItems, sectionItemsKeys } from '../../api/menu'
+import { menuKeys, fetchSections, fetchSectionItems, sectionItemsKeys, DEFAULT_SECTIONS } from '../../api/menu'
 import './ContentPage.css'
 
 const API = '/api/content'
@@ -103,11 +103,34 @@ export default function ContentPage() {
   const [error, setError] = useState<string | null>(null)
   const [linksPage, setLinksPage] = useState(1)
 
+  const { data: linksList = [], isLoading: linksLoading, error: linksError } = useQuery({
+    queryKey: linksKeys.list(),
+    queryFn: fetchLinks,
+    enabled: id === 'links',
+  })
+
+  const { data: sectionsData, isLoading: sectionsLoading } = useQuery({
+    queryKey: menuKeys.list(),
+    queryFn: fetchSections,
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 5000),
+  })
+  const sections = sectionsData ?? DEFAULT_SECTIONS
+  const pathNorm = (location.pathname || '/').replace(/\/$/, '') || '/'
+  const sectionByPath = sections.find((s) => (s.path.replace(/\/$/, '') || '/') === pathNorm)
+
   useEffect(() => {
     if (!id) return
+    if (paramId && sectionsLoading) return
+    if (paramId && sectionByPath) {
+      setContent(null)
+      setError(null)
+      setLoading(false)
+      return
+    }
     setLoading(true)
     setError(null)
-    fetch(`${API}/${id}`)
+    fetch(`${API}/${id}`, { credentials: 'include' })
       .then((res) => {
         if (!res.ok) throw new Error('Not found')
         return res.json()
@@ -118,21 +141,7 @@ export default function ContentPage() {
       })
       .catch(() => setError('Раздел не найден'))
       .finally(() => setLoading(false))
-  }, [id])
-
-  const { data: linksList = [], isLoading: linksLoading, error: linksError } = useQuery({
-    queryKey: linksKeys.list(),
-    queryFn: fetchLinks,
-    enabled: id === 'links',
-  })
-
-  const { data: sections = [] } = useQuery({
-    queryKey: menuKeys.list(),
-    queryFn: fetchSections,
-  })
-
-  const pathNorm = (location.pathname || '/').replace(/\/$/, '') || '/'
-  const sectionByPath = sections.find((s) => (s.path.replace(/\/$/, '') || '/') === pathNorm)
+  }, [id, paramId, sectionsLoading, sectionByPath?.id])
 
   const { data: sectionItems = [] } = useQuery({
     queryKey: sectionItemsKeys.list(sectionByPath?.id ?? ''),
@@ -142,6 +151,7 @@ export default function ContentPage() {
 
   if (loading) return <section className="page"><div className="card"><p>Загрузка...</p></div></section>
   if (error || !content) {
+    if (sectionsLoading && !sectionByPath) return <section className="page"><div className="card"><p>Загрузка...</p></div></section>
     if (sectionByPath) {
       return (
         <section className="page content-page">

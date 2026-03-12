@@ -23,13 +23,22 @@ export type Section = {
   description?: string
 }
 
+export const DEFAULT_SECTIONS: Section[] = [
+  { id: 'about', title: 'О себе', path: '/' },
+  { id: 'achievements', title: 'Достижения', path: '/achievements' },
+  { id: 'materials', title: 'Материалы', path: '/materials' },
+  { id: 'news', title: 'Новости', path: '/news' },
+  { id: 'contact', title: 'Контакты', path: '/contact' },
+  { id: 'links', title: 'Полезные ссылки', path: '/links' },
+]
+
 export const menuKeys = {
   all: ['menu'] as const,
   list: () => [...menuKeys.all, 'list'] as const,
 }
 
 export async function fetchSections(): Promise<Section[]> {
-  const res = await fetch(`${API}/sections`)
+  const res = await fetch(`${API}/sections`, { credentials: 'include' })
   if (!res.ok) throw new Error(String(res.status))
   return res.json()
 }
@@ -60,7 +69,7 @@ export const sectionItemsKeys = {
 }
 
 export async function fetchSectionItems(sectionId: string): Promise<SectionItem[]> {
-  const res = await fetch(`${API}/section/${sectionId}/items`)
+  const res = await fetch(`${API}/section/${sectionId}/items`, { credentials: 'include' })
   if (!res.ok) throw new Error(String(res.status))
   return res.json()
 }
