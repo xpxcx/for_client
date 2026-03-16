@@ -21,6 +21,40 @@
   line-height: 1.5;
 }
 
+.content-section-photo {
+  display: flex;
+  justify-content: center;
+}
+
+.content-section-photo img {
+  max-width: 320px;
+  max-height: 320px;
+  width: auto;
+  height: auto;
+  border-radius: 6px;
+}
+
+.content-section-lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.content-section-lightbox-inner {
+  max-width: 90vw;
+  max-height: 90vh;
+}
+
+.content-section-lightbox-inner img {
+  max-width: 100%;
+  max-height: 100%;
+  display: block;
+}
+
 .links-list {
   list-style: none;
   margin: 1.5rem 0 0;

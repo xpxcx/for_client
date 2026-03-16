@@ -102,6 +102,7 @@ export default function ContentPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [linksPage, setLinksPage] = useState(1)
+  const [lightboxImage, setLightboxImage] = useState<string | null>(null)
 
   const { data: linksList = [], isLoading: linksLoading, error: linksError } = useQuery({
     queryKey: linksKeys.list(),
@@ -161,28 +162,41 @@ export default function ContentPage() {
           )}
           {sectionItems.length > 0 ? (
             <div className="content-section-items materials-list">
-              {sectionItems.map((item) => (
-                <article key={item.id} className="card material-card">
-                  <div className="material-info-item">
-                    <span className="material-info-label">Название</span>
-                    <span className="material-info-value material-info-title">{item.title}</span>
-                  </div>
-                  {item.description && (
+              {sectionItems.map((item) => {
+                const isImage = !!item.link && /\.(jpe?g|png|gif|webp|bmp|svg)$/i.test(item.link)
+                return (
+                  <article key={item.id} className="card material-card">
                     <div className="material-info-item">
-                      <span className="material-info-label">Описание</span>
-                      <p className="material-info-desc">{item.description}</p>
+                      <span className="material-info-label">Название</span>
+                      <span className="material-info-value material-info-title">{item.title}</span>
                     </div>
-                  )}
-                  {item.link && (
-                    <div className="material-info-item">
-                      <span className="material-info-label">Материал</span>
-                      <a href={item.link} target="_blank" rel="noreferrer" className="material-info-link">
-                        Открыть
-                      </a>
-                    </div>
-                  )}
-                </article>
-              ))}
+                    {item.description && (
+                      <div className="material-info-item">
+                        <span className="material-info-label">Описание</span>
+                        <p className="material-info-desc">{item.description}</p>
+                      </div>
+                    )}
+                    {item.link && (
+                      <div className="material-info-item">
+                        <span className="material-info-label">{isImage ? 'Фото' : 'Материал'}</span>
+                        {isImage ? (
+                          <div
+                            className="content-section-photo"
+                            onClick={() => setLightboxImage(item.link!)}
+                            style={{ cursor: 'pointer' }}
+                          >
+                            <img src={item.link} alt="" />
+                          </div>
+                        ) : (
+                          <a href={item.link} target="_blank" rel="noreferrer" className="material-info-link">
+                            Открыть
+                          </a>
+                        )}
+                      </div>
+                    )}
+                  </article>
+                )
+              })}
             </div>
           ) : (
             <div className="content-section-empty card">
@@ -190,6 +204,13 @@ export default function ContentPage() {
             </div>
           )}
           <PageNavButtons />
+          {lightboxImage && (
+            <div className="content-section-lightbox" onClick={() => setLightboxImage(null)}>
+              <div className="content-section-lightbox-inner" onClick={(e) => e.stopPropagation()}>
+                <img src={lightboxImage} alt="" />
+              </div>
+            </div>
+          )}
         </section>
       )
     }

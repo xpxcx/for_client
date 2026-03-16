@@ -23,6 +23,8 @@ export default function CabinetSectionPage() {
   const { id: sectionId } = useParams<{ id: string }>()
   const queryClient = useQueryClient()
   const [form, setForm] = useState(emptyForm)
+  const [materialType, setMaterialType] = useState<'fileOrLink' | 'photo'>('fileOrLink')
+  const [lightboxImage, setLightboxImage] = useState<string | null>(null)
   const [editingItemId, setEditingItemId] = useState<string | null>(null)
   const [showAdd, setShowAdd] = useState(false)
   const [page, setPage] = useState(1)
@@ -77,6 +79,9 @@ export default function CabinetSectionPage() {
   const startEdit = (item: SectionItem) => {
     setEditingItemId(item.id)
     setShowAdd(false)
+    const isImage =
+      !!item.link && /\.(jpe?g|png|gif|webp|bmp|svg)$/i.test(item.link)
+    setMaterialType(isImage ? 'photo' : 'fileOrLink')
     setForm({
       title: item.title,
       description: item.description ?? '',
@@ -188,7 +193,7 @@ export default function CabinetSectionPage() {
     )
 
   return (
-    <>
+    <div className="cabinet-section-page">
       <h2>Управление «{section.title}»</h2>
       {section.description && <p className="cabinet-hint">{section.description}</p>}
       {showAdd && (
@@ -214,12 +219,41 @@ export default function CabinetSectionPage() {
               />
             </div>
             <div className="form-group">
-              <label htmlFor="section-item-add-link">Ссылка или файл</label>
+              <label htmlFor="section-item-add-link">Тип материала</label>
+              <div className="material-type-row">
+                <label className="material-type-option">
+                  <input
+                    type="radio"
+                    name="material-type-add"
+                    checked={materialType === 'fileOrLink'}
+                    onChange={() => setMaterialType('fileOrLink')}
+                  />
+                  <span>Ссылка или файл</span>
+                </label>
+                <label className="material-type-option">
+                  <input
+                    type="radio"
+                    name="material-type-add"
+                    checked={materialType === 'photo'}
+                    onChange={() => setMaterialType('photo')}
+                  />
+                  <span>Фото</span>
+                </label>
+              </div>
               {form.link ? (
                 <div>
                   <p className="form-file-hint" style={{ marginBottom: '0.5rem' }}>
                     <a href={form.link} target="_blank" rel="noreferrer">{form.link}</a>
                   </p>
+                  {materialType === 'photo' && (
+                    <div
+                      className="section-photo-preview"
+                      onClick={() => setLightboxImage(form.link)}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <img src={form.link} alt={form.title || 'Фото'} />
+                    </div>
+                  )}
                   <button
                     type="button"
                     className="btn btn-small btn-danger"
@@ -234,7 +268,11 @@ export default function CabinetSectionPage() {
                     id="section-item-add-link"
                     value={form.link}
                     onChange={(e) => setForm((f) => ({ ...f, link: e.target.value }))}
-                    placeholder="https://... или прикрепите файл ниже"
+                    placeholder={
+                      materialType === 'photo'
+                        ? 'https://... или прикрепите фото ниже'
+                        : 'https://... или прикрепите файл ниже'
+                    }
                   />
                   <div className="form-group-file-upload">
                     <span className="form-group-file-or">или</span>
@@ -244,12 +282,16 @@ export default function CabinetSectionPage() {
                       onClick={() => addFileRef.current?.click()}
                       disabled={uploading}
                     >
-                      {uploading ? 'Загрузка...' : 'Прикрепить файл'}
+                      {uploading
+                        ? 'Загрузка...'
+                        : materialType === 'photo'
+                        ? 'Прикрепить фото'
+                        : 'Прикрепить файл'}
                     </button>
                     <input
                       ref={addFileRef}
                       type="file"
-                      accept="*/*"
+                      accept={materialType === 'photo' ? 'image/*' : '*/*'}
                       onChange={handleFileAdd}
                       style={{ display: 'none' }}
                     />
@@ -299,12 +341,41 @@ export default function CabinetSectionPage() {
               />
             </div>
             <div className="form-group">
-              <label htmlFor="section-item-edit-link">Ссылка или файл</label>
+              <label htmlFor="section-item-edit-link">Тип материала</label>
+              <div className="material-type-row">
+                <label className="material-type-option">
+                  <input
+                    type="radio"
+                    name="material-type-edit"
+                    checked={materialType === 'fileOrLink'}
+                    onChange={() => setMaterialType('fileOrLink')}
+                  />
+                  <span>Ссылка или файл</span>
+                </label>
+                <label className="material-type-option">
+                  <input
+                    type="radio"
+                    name="material-type-edit"
+                    checked={materialType === 'photo'}
+                    onChange={() => setMaterialType('photo')}
+                  />
+                  <span>Фото</span>
+                </label>
+              </div>
               {form.link ? (
                 <div>
                   <p className="form-file-hint" style={{ marginBottom: '0.5rem' }}>
                     <a href={form.link} target="_blank" rel="noreferrer">{form.link}</a>
                   </p>
+                  {materialType === 'photo' && (
+                    <div
+                      className="section-photo-preview"
+                      onClick={() => setLightboxImage(form.link)}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <img src={form.link} alt={form.title || 'Фото'} />
+                    </div>
+                  )}
                   <button
                     type="button"
                     className="btn btn-small btn-danger"
@@ -319,7 +390,11 @@ export default function CabinetSectionPage() {
                     id="section-item-edit-link"
                     value={form.link}
                     onChange={(e) => setForm((f) => ({ ...f, link: e.target.value }))}
-                    placeholder="https://... или прикрепите файл ниже"
+                    placeholder={
+                      materialType === 'photo'
+                        ? 'https://... или прикрепите фото ниже'
+                        : 'https://... или прикрепите файл ниже'
+                    }
                   />
                   <div className="form-group-file-upload">
                     <span className="form-group-file-or">или</span>
@@ -329,12 +404,16 @@ export default function CabinetSectionPage() {
                       onClick={() => editFileRef.current?.click()}
                       disabled={uploading}
                     >
-                      {uploading ? 'Загрузка...' : 'Прикрепить файл'}
+                      {uploading
+                        ? 'Загрузка...'
+                        : materialType === 'photo'
+                        ? 'Прикрепить фото'
+                        : 'Прикрепить файл'}
                     </button>
                     <input
                       ref={editFileRef}
                       type="file"
-                      accept="*/*"
+                      accept={materialType === 'photo' ? 'image/*' : '*/*'}
                       onChange={handleFileEdit}
                       style={{ display: 'none' }}
                     />
@@ -368,10 +447,20 @@ export default function CabinetSectionPage() {
                   <div>
                     <strong>{item.title}</strong>
                     {item.description && <p className="cabinet-list-desc">{item.description}</p>}
-                    {item.link && (
-                      <a href={item.link} target="_blank" rel="noreferrer" className="link">
-                        Ссылка
-                      </a>
+                    {item.link && /\.(jpe?g|png|gif|webp|bmp|svg)$/i.test(item.link) ? (
+                      <div
+                        className="section-photo-preview"
+                        onClick={() => setLightboxImage(item.link!)}
+                        style={{ cursor: 'pointer' }}
+                      >
+                        <img src={item.link} alt={item.title} />
+                      </div>
+                    ) : (
+                      item.link && (
+                        <a href={item.link} target="_blank" rel="noreferrer" className="link">
+                          Ссылка
+                        </a>
+                      )
                     )}
                   </div>
                   <div className="cabinet-list-actions">
@@ -399,6 +488,13 @@ export default function CabinetSectionPage() {
           </>
         )}
       </div>
-    </>
+      {lightboxImage && (
+        <div className="section-lightbox" onClick={() => setLightboxImage(null)}>
+          <div className="section-lightbox-inner" onClick={(e) => e.stopPropagation()}>
+            <img src={lightboxImage} alt="" />
+          </div>
+        </div>
+      )}
+    </div>
   )
 }
